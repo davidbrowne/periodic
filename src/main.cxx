@@ -21,6 +21,29 @@
 void sandbox_function()
 {
 	// put fun code here
+
+
+	// periodic or repeating periods
+	// non-periodic or non-repeating periods or discontinuous?
+
+	// inverses of the above
+
+	// periodic coordinate systems
+	// inverses of periodic coordinate systems
+
+	// BAMs
+	// BAM tolerance w.r.t. double
+
+	// turns
+
+	// angle position vs angle displacement (or swept angle)
+
+	// conversions between turns/radians/degrees/etc
+
+	// unsigned period (e.g., angles from [0, 360) degrees)
+	// signed period (e.g., angles from [-180, 180) degrees)
+
+	// phase shift/amplitude shift/amplitude scaling/period scaling
 }
 
 

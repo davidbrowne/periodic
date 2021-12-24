@@ -2,6 +2,16 @@
 
 **periodic** is a **c++20 library** that is for exploring things about angles and intervals.
 
+## Possible Topics
+* Binary Angular Measurement (BAM), most likely for 64-bit angles
+* Repeating and non-repeating periods
+* Inverses of periods
+* Periodic coordinate systems - e.g., math-centric vs. navigation-centric
+* Turns (as opposed to radians or degrees), and conversions between systems
+* Tau vs. pi
+* Unsigned periods, like [0, 360), vs signed periods [-180, 180)
+* Phase shift/amplitude shift/amplitude scaling/period scaling, etc.
+* Periodic intervals (and inverse intervals) - animation, easing
 
 ## Status
 
