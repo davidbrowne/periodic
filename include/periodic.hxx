@@ -963,6 +963,103 @@ namespace per
 
 	} // namespace cxcm
 
+	// 2* pi = tau
+	// https://tauday.com/tau-manifesto
+	template <std::floating_point T>
+	constexpr inline T tau = T(2 * std::numbers::pi_v<T>);
+
+	// period of 1
+	constexpr double sawtooth(double input)
+	{
+		return input - cxcm::floor(input);
+	}
+
+	// a double value is reduced to a value in range [0.0, 1.0).
+	// if you imagine the number line, represented by a double,
+	// where you only care about the fractional part, and if that
+	// fractional part is negative then add 1.0.
+	constexpr double normalize_input(double input)
+	{
+		return sawtooth(input);
+	}
+
+	// 64-bit binary angular measurement.
+	// this is a position, not a quantity.
+	// size comparison makes no sense.
+	// distance between values can make sense, but what units? bam is not a quantity
+	struct bam64
+	{
+		unsigned long long value;
+
+		static constexpr double unit_period_to_bam = 0x1p64;
+		static constexpr double bam_to_unit_period = 0x1p-64;
+
+		static constexpr unsigned long long zero_turn			{ 0x0000000000000000 };
+		static constexpr unsigned long long quarter_turn		{ 0x4000000000000000 };
+		static constexpr unsigned long long half_turn			{ 0x8000000000000000 };
+		static constexpr unsigned long long three_quarter_turn	{ 0xC000000000000000 };
+		static constexpr unsigned long long eighth_turn			{ 0x2000000000000000 };
+		static constexpr unsigned long long sixteenth_turn		{ 0x1000000000000000 };
+		static constexpr unsigned long long thirty_second_turn	{ 0x0800000000000000 };
+		static constexpr unsigned long long sixty_fourth_turn	{ 0x0400000000000000 };
+
+		static constexpr bam64 from_turns(double turns) noexcept
+		{
+			return bam64{ .value = static_cast<unsigned long long>(normalize_input(turns) * unit_period_to_bam) };
+		}
+
+		static constexpr bam64 from_degrees(double degrees) noexcept
+		{
+			return from_turns(degrees / 360.0);
+		}
+
+		static constexpr bam64 from_radians(double radians) noexcept
+		{
+			return from_turns(radians / tau<double>);
+		}
+
+		constexpr double to_turns() const noexcept
+		{
+			return this->value * bam_to_unit_period;
+		}
+
+		constexpr double to_degrees() const noexcept
+		{
+			return 360.0 * to_turns();
+		}
+
+		constexpr double to_radians() const noexcept
+		{
+			return tau<double> * to_turns();
+		}
+
+		// relies on unsigned overflow
+		constexpr bam64 operator +(bam64 rhs) const noexcept
+		{
+			return bam64{ this->value + rhs.value };
+		}
+
+		// relies on unsigned underflow
+		constexpr bam64 operator -(bam64 rhs) const noexcept
+		{
+			return bam64{ this->value - rhs.value };
+		}
+
+		// two's complement
+		// for a BAM, negation is its complement -> (1 - bam)
+		constexpr bam64 operator -() const noexcept
+		{
+			return bam64{ ~(this->value) + 1ULL };
+		}
+
+		// two's complement - same as negation
+		// for a BAM, negation is its complement -> (1 - normalized_periodic_value)
+		constexpr bam64 operator ~() const noexcept
+		{
+			return bam64{ ~(this->value) + 1ULL };
+		}
+
+	};
 }	// namespace per
 
 

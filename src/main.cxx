@@ -21,7 +21,8 @@
 void sandbox_function()
 {
 	// put fun code here
-
+	per::bam64 some_turns{ per::bam64::quarter_turn };
+	[[maybe_unused]] auto complement = ~some_turns;
 
 	// periodic or repeating periods
 	// non-periodic or non-repeating periods or discontinuous?
