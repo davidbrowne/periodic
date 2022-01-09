@@ -4,8 +4,8 @@
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 // opening include guard
-#if !defined(PERIODIC_PERIODIC_HXX)
-#define PERIODIC_PERIODIC_HXX
+#if !defined(PER_PERIODIC_HXX)
+#define PER_PERIODIC_HXX
 
 #include <type_traits>				// requirements
 #include <concepts>					// requirements
@@ -18,7 +18,7 @@
 #include <cmath>					// for cxcm
 
 //
-// Data Structures for Geometric Algebra (dsga)
+// periodic
 //
 
 // version info
@@ -33,7 +33,7 @@ namespace per
 	{
 		// copyright for cxcm
 		
-		//          Copyright David Browne 2020-2021.
+		//          Copyright David Browne 2020-2022.
 		// Distributed under the Boost Software License, Version 1.0.
 		//    (See accompanying file LICENSE_1_0.txt or copy at
 		//          https://www.boost.org/LICENSE_1_0.txt)
@@ -688,7 +688,7 @@ namespace per
 			// trunc()
 			//
 
-	#if !defined(DSGA_CXCM_DISABLE_RUNTIME_OPTIMIZATIONS) && (defined(_DEBUG) || defined(_M_IX86))
+	#if !defined(PERIODIC_CXCM_DISABLE_RUNTIME_OPTIMIZATIONS) && (defined(_DEBUG) || defined(_M_IX86))
 
 			// rounds towards zero
 
@@ -721,7 +721,7 @@ namespace per
 			// floor()
 			//
 
-	#if !defined(DSGA_CXCM_DISABLE_RUNTIME_OPTIMIZATIONS) && (defined(_DEBUG) || defined(_M_IX86))
+	#if !defined(PERIODIC_CXCM_DISABLE_RUNTIME_OPTIMIZATIONS) && (defined(_DEBUG) || defined(_M_IX86))
 
 			// rounds towards negative infinity
 
@@ -754,7 +754,7 @@ namespace per
 			// ceil()
 			//
 
-	#if !defined(DSGA_CXCM_DISABLE_RUNTIME_OPTIMIZATIONS) && (defined(_DEBUG) || defined(_M_IX86))
+	#if !defined(PERIODIC_CXCM_DISABLE_RUNTIME_OPTIMIZATIONS) && (defined(_DEBUG) || defined(_M_IX86))
 
 			// rounds towards positive infinity
 
@@ -787,7 +787,7 @@ namespace per
 			// round()
 			//
 
-	#if !defined(DSGA_CXCM_DISABLE_RUNTIME_OPTIMIZATIONS) && (defined(_DEBUG) || defined(_M_IX86))
+	#if !defined(PERIODIC_CXCM_DISABLE_RUNTIME_OPTIMIZATIONS) && (defined(_DEBUG) || defined(_M_IX86))
 
 			// rounds to nearest integral position, halfway cases away from zero
 
@@ -834,7 +834,7 @@ namespace per
 			// fmod()
 			//
 
-	#if !defined(DSGA_CXCM_DISABLE_RUNTIME_OPTIMIZATIONS) && (defined(_DEBUG) || defined(_M_IX86))
+	#if !defined(PERIODIC_CXCM_DISABLE_RUNTIME_OPTIMIZATIONS) && (defined(_DEBUG) || defined(_M_IX86))
 
 			// the floating point remainder of division
 
@@ -881,9 +881,9 @@ namespace per
 			// sqrt()
 			//
 
-	#if DSGA_CXCM_APPROXIMATIONS_ALLOWED
+	#if PERIODIC_CXCM_APPROXIMATIONS_ALLOWED
 
-		#if !defined(DSGA_CXCM_DISABLE_RUNTIME_OPTIMIZATIONS) && (defined(_DEBUG) || defined(_M_IX86))
+		#if !defined(PERIODIC_CXCM_DISABLE_RUNTIME_OPTIMIZATIONS) && (defined(_DEBUG) || defined(_M_IX86))
 
 			template <std::floating_point T>
 			constexpr T sqrt(T value) noexcept
@@ -922,9 +922,9 @@ namespace per
 			// rsqrt() - inverse square root
 			//
 
-	#if DSGA_CXCM_APPROXIMATIONS_ALLOWED
+	#if PERIODIC_CXCM_APPROXIMATIONS_ALLOWED
 
-		#if !defined(DSGA_CXCM_DISABLE_RUNTIME_OPTIMIZATIONS) && (defined(_DEBUG) || defined(_M_IX86))
+		#if !defined(PERIODIC_CXCM_DISABLE_RUNTIME_OPTIMIZATIONS) && (defined(_DEBUG) || defined(_M_IX86))
 
 			template <std::floating_point T>
 			constexpr T rsqrt(T value) noexcept
