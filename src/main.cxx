@@ -21,8 +21,11 @@
 void sandbox_function()
 {
 	// put fun code here
-	per::bam64 some_turns{ per::bam64::quarter_turn };
+	period::bam64 some_turns{ period::bam64::quarter_turn };
 	[[maybe_unused]] auto complement = ~some_turns;
+
+	[[maybe_unused]] constexpr auto foo = period::bam64::from_radians(period::tau<double> * period::bam64::radian_turn);
+	[[maybe_unused]] constexpr auto bar = period::bam64::from_degrees(360.0 * period::bam64::degree_turn);
 
 	// periodic or repeating periods
 	// non-periodic or non-repeating periods or discontinuous?

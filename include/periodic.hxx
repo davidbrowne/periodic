@@ -25,9 +25,9 @@
 
 constexpr inline int PERIODIC_MAJOR_VERSION = 0;
 constexpr inline int PERIODIC_MINOR_VERSION = 0;
-constexpr inline int PERIODIC_PATCH_VERSION = 1;
+constexpr inline int PERIODIC_PATCH_VERSION = 2;
 
-namespace per
+namespace period
 {
 	namespace cxcm
 	{
@@ -969,7 +969,7 @@ namespace per
 	constexpr inline T tau = T(2 * std::numbers::pi_v<T>);
 
 	// period of 1
-	constexpr double sawtooth(double input)
+	constexpr double sawtooth(double input) noexcept
 	{
 		return input - cxcm::floor(input);
 	}
@@ -978,7 +978,7 @@ namespace per
 	// if you imagine the number line, represented by a double,
 	// where you only care about the fractional part, and if that
 	// fractional part is negative then add 1.0.
-	constexpr double normalize_input(double input)
+	constexpr double normalize_input(double input) noexcept
 	{
 		return sawtooth(input);
 	}
@@ -986,7 +986,9 @@ namespace per
 	// 64-bit binary angular measurement.
 	// this is a position, not a quantity.
 	// size comparison makes no sense.
-	// distance between values can make sense, but what units? bam is not a quantity
+	// distance between values can make sense, but what units? bam is not a quantity.
+	// but can we use the same representation for a swept angle -- but a periodic swept
+	// angle, not linear, i.e., we couldn't represent more than one swept turn
 	struct bam64
 	{
 		unsigned long long value;
@@ -1002,6 +1004,9 @@ namespace per
 		static constexpr unsigned long long sixteenth_turn		{ 0x1000000000000000 };
 		static constexpr unsigned long long thirty_second_turn	{ 0x0800000000000000 };
 		static constexpr unsigned long long sixty_fourth_turn	{ 0x0400000000000000 };
+
+		static constexpr unsigned long long radian_turn			{ 0x28be60db93910600 };
+		static constexpr unsigned long long degree_turn			{ 0x00b60b60b60b60b8 };
 
 		static constexpr bam64 from_turns(double turns) noexcept
 		{
@@ -1036,31 +1041,37 @@ namespace per
 		// relies on unsigned overflow
 		constexpr bam64 operator +(bam64 rhs) const noexcept
 		{
-			return bam64{ this->value + rhs.value };
+			return { this->value + rhs.value };
 		}
 
 		// relies on unsigned underflow
 		constexpr bam64 operator -(bam64 rhs) const noexcept
 		{
-			return bam64{ this->value - rhs.value };
+			return { this->value - rhs.value };
 		}
 
-		// two's complement
+		// unary plus is identity operation
+		constexpr bam64 operator +() const noexcept
+		{
+			return { this->value };
+		}
+
+		// two's complement negation
 		// for a BAM, negation is its complement -> (1 - bam)
 		constexpr bam64 operator -() const noexcept
 		{
-			return bam64{ ~(this->value) + 1ULL };
+			return { ~(this->value) + 1ULL };
 		}
 
 		// two's complement - same as negation
 		// for a BAM, negation is its complement -> (1 - normalized_periodic_value)
 		constexpr bam64 operator ~() const noexcept
 		{
-			return bam64{ ~(this->value) + 1ULL };
+			return { ~(this->value) + 1ULL };
 		}
 
 	};
-}	// namespace per
+}	// namespace period
 
 
 // closing include guard
