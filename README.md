@@ -13,6 +13,22 @@
 * Phase shift/amplitude shift/amplitude scaling/period scaling, etc.
 * Periodic intervals (and inverse intervals) - animation, easing
 
+### Building Block Functions
+![floor](./svg/floor.svg) | ![ceil](./svg/ceil.svg)  |
+---|---|
+![trunc](./svg/trunc.svg) | ![round](./svg/round.svg) |
+
+### Functions with Identity
+![identity and floor](./svg/identity_and_floor.svg) | ![identity and ceil](./svg/identity_and_ceil.svg)
+---|---|
+![identity and trunc](./svg/identity_and_trunc.svg) | ![identity and round](./svg/identity_and_round.svg)
+
+### Fundamental Periodic Driver and its Reverse/Inverse(?)
+![sawtooth](./svg/identity_minus_floor.svg) | ![reverse of sawtooth](./svg/ceil_minus_identity.svg)
+---|---|
+
+
+
 ## Status
 
 Current version: `v0.0.1`
