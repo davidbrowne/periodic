@@ -27,6 +27,19 @@ void sandbox_function()
 	[[maybe_unused]] constexpr auto foo = period::bam64::from_radians(period::tau<double> * period::bam64::radian_turn);
 	[[maybe_unused]] constexpr auto bar = period::bam64::from_degrees(360.0 * period::bam64::degree_turn);
 
+
+	constexpr auto input_val = 190;
+	constexpr auto output_period = 360.0;
+	constexpr auto output_value_shift = 0.0;
+	constexpr auto output_time_shift = -180;
+	constexpr auto input_period = 360.0;
+
+	[[maybe_unused]] constexpr auto answer = period::total_phi(input_val, input_period, output_period, output_time_shift, output_value_shift);
+
+
+
+
+
 	// periodic or repeating periods
 	// non-periodic or non-repeating periods or discontinuous?
 

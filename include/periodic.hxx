@@ -1071,6 +1071,20 @@ namespace period
 		}
 
 	};
+
+
+	constexpr double basic_phi(double val) noexcept
+	{
+		return val - cxcm::floor(val);
+	}
+
+
+	constexpr double total_phi(double input_val, double input_period, double output_period, double output_time_shift, double output_value_shift) noexcept
+	{
+		return output_period * ((input_val / input_period) - cxcm::floor((input_val / input_period) - (output_time_shift / output_period))) + output_value_shift;
+	}
+
+
 }	// namespace period
 
 
