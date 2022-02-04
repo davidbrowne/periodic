@@ -36,6 +36,31 @@ void sandbox_function()
 
 	[[maybe_unused]] constexpr auto answer = period::total_phi(input_val, input_period, output_period, output_time_shift, output_value_shift);
 
+#if 0
+	std::printf("period::basic_phi( 1.0, -0.5) = %g\n", period::basic_reverse_phi(-1.0, -0.5));
+	std::printf("period::basic_phi( 0.9, -0.5) = %g\n", period::basic_reverse_phi(-0.9, -0.5));
+	std::printf("period::basic_phi( 0.8, -0.5) = %g\n", period::basic_reverse_phi(-0.8, -0.5));
+	std::printf("period::basic_phi( 0.7, -0.5) = %g\n", period::basic_reverse_phi(-0.7, -0.5));
+	std::printf("period::basic_phi( 0.6, -0.5) = %g\n", period::basic_reverse_phi(-0.6, -0.5));
+	std::printf("period::basic_phi( 0.5, -0.5) = %g\n", period::basic_reverse_phi(-0.5, -0.5));
+	std::printf("period::basic_phi( 0.4, -0.5) = %g\n", period::basic_reverse_phi(-0.4, -0.5));
+	std::printf("period::basic_phi( 0.3, -0.5) = %g\n", period::basic_reverse_phi(-0.3, -0.5));
+	std::printf("period::basic_phi( 0.2, -0.5) = %g\n", period::basic_reverse_phi(-0.2, -0.5));
+	std::printf("period::basic_phi( 0.1, -0.5) = %g\n", period::basic_reverse_phi(-0.1, -0.5));
+	std::printf("period::basic_phi( 0.0, -0.5) = %g\n", period::basic_reverse_phi( 0.0, -0.5));
+	std::printf("period::basic_phi(-0.1, -0.5) = %g\n", period::basic_reverse_phi( 0.1, -0.5));
+	std::printf("period::basic_phi(-0.2, -0.5) = %g\n", period::basic_reverse_phi( 0.2, -0.5));
+	std::printf("period::basic_phi(-0.3, -0.5) = %g\n", period::basic_reverse_phi( 0.3, -0.5));
+	std::printf("period::basic_phi(-0.4, -0.5) = %g\n", period::basic_reverse_phi( 0.4, -0.5));
+	std::printf("period::basic_phi(-0.5, -0.5) = %g\n", period::basic_reverse_phi( 0.5, -0.5));
+	std::printf("period::basic_phi(-0.6, -0.5) = %g\n", period::basic_reverse_phi( 0.6, -0.5));
+	std::printf("period::basic_phi(-0.7, -0.5) = %g\n", period::basic_reverse_phi( 0.7, -0.5));
+	std::printf("period::basic_phi(-0.8, -0.5) = %g\n", period::basic_reverse_phi( 0.8, -0.5));
+	std::printf("period::basic_phi(-0.9, -0.5) = %g\n", period::basic_reverse_phi( 0.9, -0.5));
+	std::printf("period::basic_phi(-1.0, -0.5) = %g\n", period::basic_reverse_phi( 1.0, -0.5));
+#endif
+
+
 
 
 

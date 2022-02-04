@@ -983,6 +983,40 @@ namespace period
 		return sawtooth(input);
 	}
 
+	// input period == 1, output period == 1, range [0, 1)
+	constexpr double basic_phi(double val) noexcept
+	{
+		return val - cxcm::floor(val);
+	}
+
+	// input period == 1, output period == 1, range [time_shift, time_shift + 1)
+	constexpr double basic_phi(double val, double time_shift) noexcept
+	{
+		return val - cxcm::floor(val - time_shift);
+	}
+
+	constexpr double total_phi(double input_val, double input_period, double output_period, double output_time_shift, double output_value_shift) noexcept
+	{
+		return output_period * ((input_val / input_period) - cxcm::floor((input_val / input_period) - (output_time_shift / output_period))) + output_value_shift;
+	}
+
+	// input period == 1, output period == 1, range [0, 1)
+	constexpr double basic_reverse_phi(double val) noexcept
+	{
+		return cxcm::ceil(val) - val;
+	}
+
+	// input period == 1, output period == 1, range [time_shift, time_shift + 1)
+	constexpr double basic_reverse_phi(double val, double time_shift) noexcept
+	{
+		return cxcm::ceil(val + time_shift) - val;
+	}
+
+	constexpr double total_reverse_phi(double input_val, double input_period, double output_period, double output_time_shift, double output_value_shift) noexcept
+	{
+		return output_period * (cxcm::ceil((input_val / input_period) + (output_time_shift / output_period)) - (input_val / input_period)) + output_value_shift;
+	}
+
 	// 64-bit binary angular measurement.
 	// this is a position, not a quantity.
 	// size comparison makes no sense.
@@ -1071,19 +1105,6 @@ namespace period
 		}
 
 	};
-
-
-	constexpr double basic_phi(double val) noexcept
-	{
-		return val - cxcm::floor(val);
-	}
-
-
-	constexpr double total_phi(double input_val, double input_period, double output_period, double output_time_shift, double output_value_shift) noexcept
-	{
-		return output_period * ((input_val / input_period) - cxcm::floor((input_val / input_period) - (output_time_shift / output_period))) + output_value_shift;
-	}
-
 
 }	// namespace period
 
