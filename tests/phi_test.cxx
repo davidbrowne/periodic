@@ -33,103 +33,104 @@ TEST_SUITE("test phi")
 		}
 
 		constexpr auto output_period = 1.0;						// amplitude scale
-		constexpr auto output_value_shift = 0.0;				// amplitude shift
+		constexpr auto output_value_shift = 0.0;				// amplitude shift on output
 		constexpr auto output_time_shift = -0.5;				// time shift
 		constexpr auto input_period = 1.0;						// input period
 		constexpr auto input_time_scale = 1.0;					// 0 < abs(x) < 1.0 is time expansion, abs(x) > 1.0 is time compression, x < 0 is time reversal
 		constexpr auto reverse_input_time_scale = -1.0;			// example of time reversal 
-		constexpr auto period_offset = 0.0;						// output period delay or origin offset (in turns)
+		constexpr auto period_offset = 0.0;						// output period delay or origin offset (in turns) -> output_origin - input_origin
+		constexpr auto input_value_shift = 0.0;					// amplitude shift on input
 
 		SUBCASE("total phi equality")
 		{
-			CHECK_EQ(period::total_phi(1.0, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(-1.0, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.9, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(-0.9, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.8, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(-0.8, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.7, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(-0.7, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.6, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(-0.6, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.5, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(-0.5, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.4, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(-0.4, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.3, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(-0.3, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.2, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(-0.2, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.1, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(-0.1, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.0, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.0, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(-0.1, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.1, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(-0.2, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.2, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(-0.3, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.3, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(-0.4, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.4, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(-0.5, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.5, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(-0.6, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.6, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(-0.7, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.7, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(-0.8, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.8, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(-0.9, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.9, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(-1.0, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(1.0, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(1.0, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(-1.0, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.9, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(-0.9, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.8, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(-0.8, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.7, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(-0.7, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.6, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(-0.6, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.5, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(-0.5, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.4, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(-0.4, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.3, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(-0.3, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.2, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(-0.2, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.1, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(-0.1, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.0, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.0, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(-0.1, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.1, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(-0.2, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.2, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(-0.3, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.3, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(-0.4, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.4, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(-0.5, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.5, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(-0.6, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.6, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(-0.7, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.7, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(-0.8, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.8, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(-0.9, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.9, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(-1.0, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(1.0, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
 		}
 
 		SUBCASE("reverse_input_time_scale")
 		{
-			CHECK_EQ(period::total_phi(1.0, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(1.0, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.9, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.9, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.8, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.8, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.7, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.7, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.6, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.6, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.5, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.5, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.4, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.4, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.3, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.3, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.2, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.2, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.1, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.1, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.0, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.0, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.1, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.1, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.2, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.2, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.3, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.3, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.4, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.4, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.5, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.5, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.6, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.6, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.7, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.7, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.8, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.8, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(0.9, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(0.9, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
-			CHECK_EQ(period::total_phi(1.0, reverse_input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset),
-					 period::total_reverse_phi(1.0, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(1.0, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(1.0, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.9, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.9, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.8, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.8, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.7, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.7, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.6, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.6, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.5, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.5, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.4, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.4, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.3, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.3, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.2, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.2, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.1, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.1, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.0, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.0, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.1, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.1, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.2, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.2, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.3, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.3, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.4, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.4, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.5, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.5, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.6, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.6, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.7, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.7, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.8, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.8, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(0.9, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(0.9, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+			CHECK_EQ(period::total_phi(1.0, reverse_input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset),
+					 period::total_reverse_phi(1.0, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
 		}
 
 	}

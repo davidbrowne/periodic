@@ -34,9 +34,10 @@ void sandbox_function()
 	constexpr auto output_time_shift = -180.0;
 	constexpr auto input_period = 360.0;
 	constexpr auto input_time_scale = 1.0;
-	constexpr auto period_offset = 0.0;
+	constexpr auto period_offset = -0.125;
+	constexpr auto input_value_shift = 0.0;
 
-	[[maybe_unused]] constexpr auto answer = period::total_phi(input_val, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset);
+	[[maybe_unused]] constexpr auto answer = period::total_phi(input_val, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset);
 
 #if 0
 	double time_offset = -0.5;
@@ -66,10 +67,23 @@ void sandbox_function()
 #endif
 
 	for (int i = 360; i >= -360; i -= 30)
-		std::printf("period::total_phi(%d, %g, %g, %g, %g, %g) = %g\n",
-					i, input_time_scale, input_period, output_period, output_time_shift, output_value_shift,
-					period::total_reverse_phi(-i, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
+		std::printf("period::total_phi(%d, %g, %g, %g, %g, %g, %g) = %g\n",
+					i, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift,
+					period::total_reverse_phi(-i, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
 
+
+	period::period_convert from_turns_to_centered_degrees{.output_period = 360.0, .output_min = -180.0};
+
+	auto d = from_turns_to_centered_degrees(.75);
+	auto rd = from_turns_to_centered_degrees.reverse(.75);
+
+	period::reverse_period_convert bearing_degrees_to_math_degrees{.input_period = 360.0, .output_period = 360.0, .period_offset = -0.25};
+	auto q = bearing_degrees_to_math_degrees(180.0);
+	auto rq = bearing_degrees_to_math_degrees.reverse(180.0);
+
+	period::reverse_period_convert math_degrees_to_bearing_degrees{.input_period = 360.0, .output_period = 360.0, .period_offset = -0.25};
+	auto s = math_degrees_to_bearing_degrees(135.0);
+	auto rs = math_degrees_to_bearing_degrees.reverse(135.0);
 
 
 	// periodic or repeating periods
