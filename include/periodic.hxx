@@ -999,8 +999,9 @@ namespace period
 							   double output_period, double output_min, double output_value_shift,
 							   double period_offset) noexcept
 	{
-		return output_period * (((input_time_scale * (input_val - input_value_shift) / input_period) - period_offset) -
-								cxcm::floor(((input_time_scale * (input_val - input_value_shift) / input_period) - period_offset) - (output_min / output_period))) + output_value_shift;
+		return output_period * (((input_time_scale * (input_val - input_value_shift) / input_period) + (period_offset / output_period)) -
+								cxcm::floor(((input_time_scale * (input_val - input_value_shift) / input_period) + (period_offset / output_period)) -
+								(output_min / output_period))) + output_value_shift;
 	}
 
 	// input period == 1, output period == 1, range [0, 1)
@@ -1019,8 +1020,8 @@ namespace period
 									   double output_period, double output_min, double output_value_shift,
 									   double period_offset) noexcept
 	{
-		return output_period * (cxcm::ceil(((input_time_scale * (input_val - input_value_shift) / input_period) + period_offset) + (output_min / output_period)) -
-								((input_time_scale * (input_val - input_value_shift) / input_period) + period_offset)) + output_value_shift;
+		return output_period * (cxcm::ceil(((input_time_scale * (input_val - input_value_shift) / input_period) - (period_offset / output_period)) + (output_min / output_period)) -
+								((input_time_scale * (input_val - input_value_shift) / input_period) - (period_offset / output_period))) + output_value_shift;
 	}
 
 	// there are so many parameters depending on the input and output situations.

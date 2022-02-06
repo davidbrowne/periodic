@@ -32,14 +32,14 @@ TEST_SUITE("test phi")
 			CHECK_EQ(period::basic_phi(-1.0, -0.5), period::basic_reverse_phi(1.0, -0.5));
 		}
 
-		constexpr auto output_period = 1.0;						// amplitude scale
-		constexpr auto output_value_shift = 0.0;				// amplitude shift on output
-		constexpr auto output_time_shift = -0.5;				// time shift
+		constexpr auto output_period = 1.0;						// output period - amplitude scale
+		constexpr auto output_value_shift = 0.0;				// linear shift on output
+		constexpr auto output_time_shift = -0.5;				// minimum value of periodic output range
 		constexpr auto input_period = 1.0;						// input period
 		constexpr auto input_time_scale = 1.0;					// 0 < abs(x) < 1.0 is time expansion, abs(x) > 1.0 is time compression, x < 0 is time reversal
 		constexpr auto reverse_input_time_scale = -1.0;			// example of time reversal 
-		constexpr auto period_offset = 0.0;						// output period delay or origin offset (in turns) -> output_origin - input_origin
-		constexpr auto input_value_shift = 0.0;					// amplitude shift on input
+		constexpr auto period_offset = 0.0;						// output period amount to periodic offset
+		constexpr auto input_value_shift = 0.0;					// linear shift on input
 
 		SUBCASE("total phi equality")
 		{
