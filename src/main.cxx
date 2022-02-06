@@ -31,37 +31,44 @@ void sandbox_function()
 	constexpr auto input_val = 190;
 	constexpr auto output_period = 360.0;
 	constexpr auto output_value_shift = 0.0;
-	constexpr auto output_time_shift = -180;
+	constexpr auto output_time_shift = -180.0;
 	constexpr auto input_period = 360.0;
+	constexpr auto input_time_scale = 1.0;
+	constexpr auto period_offset = 0.0;
 
-	[[maybe_unused]] constexpr auto answer = period::total_phi(input_val, input_period, output_period, output_time_shift, output_value_shift);
+	[[maybe_unused]] constexpr auto answer = period::total_phi(input_val, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset);
 
 #if 0
-	std::printf("period::basic_phi( 1.0, -0.5) = %g\n", period::basic_reverse_phi(-1.0, -0.5));
-	std::printf("period::basic_phi( 0.9, -0.5) = %g\n", period::basic_reverse_phi(-0.9, -0.5));
-	std::printf("period::basic_phi( 0.8, -0.5) = %g\n", period::basic_reverse_phi(-0.8, -0.5));
-	std::printf("period::basic_phi( 0.7, -0.5) = %g\n", period::basic_reverse_phi(-0.7, -0.5));
-	std::printf("period::basic_phi( 0.6, -0.5) = %g\n", period::basic_reverse_phi(-0.6, -0.5));
-	std::printf("period::basic_phi( 0.5, -0.5) = %g\n", period::basic_reverse_phi(-0.5, -0.5));
-	std::printf("period::basic_phi( 0.4, -0.5) = %g\n", period::basic_reverse_phi(-0.4, -0.5));
-	std::printf("period::basic_phi( 0.3, -0.5) = %g\n", period::basic_reverse_phi(-0.3, -0.5));
-	std::printf("period::basic_phi( 0.2, -0.5) = %g\n", period::basic_reverse_phi(-0.2, -0.5));
-	std::printf("period::basic_phi( 0.1, -0.5) = %g\n", period::basic_reverse_phi(-0.1, -0.5));
-	std::printf("period::basic_phi( 0.0, -0.5) = %g\n", period::basic_reverse_phi( 0.0, -0.5));
-	std::printf("period::basic_phi(-0.1, -0.5) = %g\n", period::basic_reverse_phi( 0.1, -0.5));
-	std::printf("period::basic_phi(-0.2, -0.5) = %g\n", period::basic_reverse_phi( 0.2, -0.5));
-	std::printf("period::basic_phi(-0.3, -0.5) = %g\n", period::basic_reverse_phi( 0.3, -0.5));
-	std::printf("period::basic_phi(-0.4, -0.5) = %g\n", period::basic_reverse_phi( 0.4, -0.5));
-	std::printf("period::basic_phi(-0.5, -0.5) = %g\n", period::basic_reverse_phi( 0.5, -0.5));
-	std::printf("period::basic_phi(-0.6, -0.5) = %g\n", period::basic_reverse_phi( 0.6, -0.5));
-	std::printf("period::basic_phi(-0.7, -0.5) = %g\n", period::basic_reverse_phi( 0.7, -0.5));
-	std::printf("period::basic_phi(-0.8, -0.5) = %g\n", period::basic_reverse_phi( 0.8, -0.5));
-	std::printf("period::basic_phi(-0.9, -0.5) = %g\n", period::basic_reverse_phi( 0.9, -0.5));
-	std::printf("period::basic_phi(-1.0, -0.5) = %g\n", period::basic_reverse_phi( 1.0, -0.5));
+	double time_offset = -0.5;
+	//double time_offset = 0.0;
+	std::printf("period::basic_phi( 1.0, %g) = %g\n", time_offset, period::basic_reverse_phi(-1.0, time_offset));
+	std::printf("period::basic_phi( 0.9, %g) = %g\n", time_offset, period::basic_reverse_phi(-0.9, time_offset));
+	std::printf("period::basic_phi( 0.8, %g) = %g\n", time_offset, period::basic_reverse_phi(-0.8, time_offset));
+	std::printf("period::basic_phi( 0.7, %g) = %g\n", time_offset, period::basic_reverse_phi(-0.7, time_offset));
+	std::printf("period::basic_phi( 0.6, %g) = %g\n", time_offset, period::basic_reverse_phi(-0.6, time_offset));
+	std::printf("period::basic_phi( 0.5, %g) = %g\n", time_offset, period::basic_reverse_phi(-0.5, time_offset));
+	std::printf("period::basic_phi( 0.4, %g) = %g\n", time_offset, period::basic_reverse_phi(-0.4, time_offset));
+	std::printf("period::basic_phi( 0.3, %g) = %g\n", time_offset, period::basic_reverse_phi(-0.3, time_offset));
+	std::printf("period::basic_phi( 0.2, %g) = %g\n", time_offset, period::basic_reverse_phi(-0.2, time_offset));
+	std::printf("period::basic_phi( 0.1, %g) = %g\n", time_offset, period::basic_reverse_phi(-0.1, time_offset));
+	std::printf("period::basic_phi( 0.0, %g) = %g\n", time_offset, period::basic_reverse_phi( 0.0, time_offset));
+	std::printf("period::basic_phi(-0.1, %g) = %g\n", time_offset, period::basic_reverse_phi( 0.1, time_offset));
+	std::printf("period::basic_phi(-0.2, %g) = %g\n", time_offset, period::basic_reverse_phi( 0.2, time_offset));
+	std::printf("period::basic_phi(-0.3, %g) = %g\n", time_offset, period::basic_reverse_phi( 0.3, time_offset));
+	std::printf("period::basic_phi(-0.4, %g) = %g\n", time_offset, period::basic_reverse_phi( 0.4, time_offset));
+	std::printf("period::basic_phi(-0.5, %g) = %g\n", time_offset, period::basic_reverse_phi( 0.5, time_offset));
+	std::printf("period::basic_phi(-0.6, %g) = %g\n", time_offset, period::basic_reverse_phi( 0.6, time_offset));
+	std::printf("period::basic_phi(-0.7, %g) = %g\n", time_offset, period::basic_reverse_phi( 0.7, time_offset));
+	std::printf("period::basic_phi(-0.8, %g) = %g\n", time_offset, period::basic_reverse_phi( 0.8, time_offset));
+	std::printf("period::basic_phi(-0.9, %g) = %g\n", time_offset, period::basic_reverse_phi( 0.9, time_offset));
+	std::printf("period::basic_phi(-1.0, %g) = %g\n", time_offset, period::basic_reverse_phi( 1.0, time_offset));
+
 #endif
 
-
-
+	for (int i = 360; i >= -360; i -= 30)
+		std::printf("period::total_phi(%d, %g, %g, %g, %g, %g) = %g\n",
+					i, input_time_scale, input_period, output_period, output_time_shift, output_value_shift,
+					period::total_reverse_phi(-i, input_time_scale, input_period, output_period, output_time_shift, output_value_shift, period_offset));
 
 
 

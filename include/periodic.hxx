@@ -995,9 +995,12 @@ namespace period
 		return val - cxcm::floor(val - time_shift);
 	}
 
-	constexpr double total_phi(double input_val, double input_period, double output_period, double output_time_shift, double output_value_shift) noexcept
+	constexpr double total_phi(double input_val, double input_time_scale, double input_period,
+							   double output_period, double output_time_shift, double output_value_shift,
+							   double period_offset) noexcept
 	{
-		return output_period * ((input_val / input_period) - cxcm::floor((input_val / input_period) - (output_time_shift / output_period))) + output_value_shift;
+		return output_period * (((input_time_scale * input_val / input_period) + period_offset) -
+								cxcm::floor(((input_time_scale * input_val / input_period) + period_offset) - (output_time_shift / output_period))) + output_value_shift;
 	}
 
 	// input period == 1, output period == 1, range [0, 1)
@@ -1012,9 +1015,12 @@ namespace period
 		return cxcm::ceil(val + time_shift) - val;
 	}
 
-	constexpr double total_reverse_phi(double input_val, double input_period, double output_period, double output_time_shift, double output_value_shift) noexcept
+	constexpr double total_reverse_phi(double input_val, double input_time_scale, double input_period,
+									   double output_period, double output_time_shift, double output_value_shift,
+									   double period_offset) noexcept
 	{
-		return output_period * (cxcm::ceil((input_val / input_period) + (output_time_shift / output_period)) - (input_val / input_period)) + output_value_shift;
+		return output_period * (cxcm::ceil(((input_time_scale * input_val / input_period) - period_offset) + (output_time_shift / output_period)) -
+								((input_time_scale * input_val / input_period) - period_offset)) + output_value_shift;
 	}
 
 	// 64-bit binary angular measurement.
