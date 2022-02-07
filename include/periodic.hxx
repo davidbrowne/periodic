@@ -1030,48 +1030,48 @@ namespace period
 	// the forward or reverse period conversion on the input value.
 
 	// normal forward conversion
-	struct period_convert
+	struct period_converter
 	{
-		double input_scale = 1.0;
-		double input_period = 1.0;
-		double output_period = 1.0;
-		double period_offset = 0.0;
-		double output_min = 0.0;
-		double output_shift = 0.0;
-		double input_shift = 0.0;
+		double input_scale = 1.0;	// scale factor: < 0 means time reversal, 0 < abs(x) < 1 means expansion, abs(x) > 1 means compression -- a.k.a. time scale
+		double input_period = 1.0;	// the period of the input values, < 0 means time reversal if input_scale > 0
+		double output_period = 1.0;	// the period of the output values, should be > 0 0 -- a.k.a. amplitude scale
+		double period_offset = 0.0;	// amount to periodically offset the output value by, values using the output period
+		double output_min = 0.0;	// the minimum of the output range, values using the output period -- a.k.a. time shift
+		double output_shift = 0.0;	// amount to linearly shift the output by -- a.k.a. amplitude shift
+		double input_shift = 0.0;	// amount to linearly shift the input by
 
 		// 
-		constexpr double operator()(double input_val) noexcept
+		constexpr double operator()(double input_val) const noexcept
 		{
 			return total_phi(input_val, input_scale, input_period, input_shift, output_period, output_min, output_shift, period_offset);
 		}
 
 		// 
-		constexpr double reverse(double input_val) noexcept
+		constexpr double reverse(double input_val) const noexcept
 		{
 			return total_reverse_phi(input_val, input_scale, input_period, input_shift, output_period, output_min, output_shift, period_offset);
 		}
 	};
 
 	// normal reverse conversion
-	struct reverse_period_convert
+	struct reverse_period_converter
 	{
-		double input_scale = 1.0;
-		double input_period = 1.0;
-		double output_period = 1.0;
-		double period_offset = 0.0;
-		double output_min = 0.0;
-		double output_shift = 0.0;
-		double input_shift = 0.0;
+		double input_scale = 1.0;	// scale factor: < 0 means time reversal, 0 < abs(x) < 1 means expansion, abs(x) > 1 means compression -- a.k.a. time scale
+		double input_period = 1.0;	// the period of the input values, < 0 means time reversal if input_scale > 0
+		double output_period = 1.0;	// the period of the output values, < 0 means amplitude reversal -- a.k.a. amplitude scale
+		double period_offset = 0.0;	// amount to periodically offset the output value by, values using the output period
+		double output_min = 0.0;	// the minimum of the output range, values using the output period -- a.k.a. time shift
+		double output_shift = 0.0;	// amount to linearly shift the output by -- a.k.a. amplitude shift
+		double input_shift = 0.0;	// amount to linearly shift the input by
 
 		// 
-		constexpr double operator()(double input_val) noexcept
+		constexpr double operator()(double input_val) const noexcept
 		{
 			return total_reverse_phi(input_val, input_scale, input_period, input_shift, output_period, output_min, output_shift, period_offset);
 		}
 
 		// 
-		constexpr double reverse(double input_val) noexcept
+		constexpr double reverse(double input_val) const noexcept
 		{
 			return total_phi(input_val, input_scale, input_period, input_shift, output_period, output_min, output_shift, period_offset);
 		}

@@ -72,18 +72,18 @@ void sandbox_function()
 					period::total_reverse_phi(-i, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
 
 
-	period::period_convert from_turns_to_centered_degrees{.output_period = 360.0, .output_min = -180.0};
+	period::period_converter from_turns_to_centered_degrees{.output_period = 360.0, .output_min = -180.0};
 
-	auto d = from_turns_to_centered_degrees(.75);
-	auto rd = from_turns_to_centered_degrees.reverse(.75);
+	[[maybe_unused]] auto d = from_turns_to_centered_degrees(.75);
+	[[maybe_unused]] auto rd = from_turns_to_centered_degrees.reverse(.75);
 
-	period::reverse_period_convert bearing_degrees_to_math_degrees{.input_period = 360.0, .output_period = 360.0, .period_offset = 90.0};
-	auto q = bearing_degrees_to_math_degrees(180.0);
-	auto rq = bearing_degrees_to_math_degrees.reverse(180.0);
+	period::reverse_period_converter bearing_degrees_to_math_degrees{.input_period = 360.0, .output_period = 360.0, .period_offset = 90.0};
+	[[maybe_unused]] auto q = bearing_degrees_to_math_degrees(180.0);
+	[[maybe_unused]] auto rq = bearing_degrees_to_math_degrees.reverse(180.0);
 
-	period::reverse_period_convert math_degrees_to_bearing_degrees{.input_period = 360.0, .output_period = 360.0, .period_offset = 90.0};
-	auto s = math_degrees_to_bearing_degrees(135.0);
-	auto rs = math_degrees_to_bearing_degrees.reverse(135.0);
+	period::reverse_period_converter math_degrees_to_bearing_degrees{.input_period = 360.0, .output_period = 360.0, .period_offset = 90.0};
+	[[maybe_unused]] auto s = math_degrees_to_bearing_degrees(135.0);
+	[[maybe_unused]] auto rs = math_degrees_to_bearing_degrees.reverse(135.0);
 
 
 	// periodic or repeating periods

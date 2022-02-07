@@ -37,7 +37,7 @@ TEST_SUITE("test phi")
 		constexpr auto output_time_shift = -0.5;				// minimum value of periodic output range
 		constexpr auto input_period = 1.0;						// input period
 		constexpr auto input_time_scale = 1.0;					// 0 < abs(x) < 1.0 is time expansion, abs(x) > 1.0 is time compression, x < 0 is time reversal
-		constexpr auto reverse_input_time_scale = -1.0;			// example of time reversal 
+		constexpr auto reverse_input_time_scale = -input_time_scale;			// example of time reversal 
 		constexpr auto period_offset = 0.0;						// output period amount to periodic offset
 		constexpr auto input_value_shift = 0.0;					// linear shift on input
 
