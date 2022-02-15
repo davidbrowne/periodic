@@ -13,6 +13,19 @@
 * Phase shift/amplitude shift/amplitude scaling/period scaling, etc.
 * Periodic intervals (and inverse intervals) - animation, easing
 
+### Binary Angular Measurement (BAM)
+We could use floating point numbers to represent angles, such as *double* or *float*. These represent a large range of number, for our binary angular measurement, we only care about values between 0 and 1.
+
+![bam generic](./svg/bam_generic.svg)
+
+We could use any integral value or bitfield to represent a binary angular measurement to a certain precision, but since *double* is so important to us and is 64 bits in size, we will use an unsigned 64 bit type, *unsigned long long*, as our best way to have as much precision as possible that is most compatible with **double*.
+
+![bam 64bit](./svg/bam_64bit.svg)
+
+ The values of the BAM are between 0 and 1 (not inclusive). The unsigned overflow behavior guarantees the periodic behavior that we want from a periodic value in the range 0 to 1 (not inclusive).
+
+We use the **phi()** function to get our intial value in range, then we use the above scale factor to turn our clamped double value into our BAM value.
+
 ### Building Block Functions
 ![identity and floor](./svg/identity_and_floor.svg) | ![identity and ceil](./svg/identity_and_ceil.svg)
 ---|---|

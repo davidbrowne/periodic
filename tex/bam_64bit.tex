@@ -1,12 +1,15 @@
-\documentclass[tikz]{standalone}
-\usepackage{amsmath}
+\documentclass[document]{standalone}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{amsmath,amssymb}
+\usepackage[active,tightpage]{preview}
 \begin{document}
-\large
+\begin{preview}
+\Large
 $
 \begin{aligned}
 &[{0.0, 1.0}) &\times &2^{+64} &&\mapsto [{0, 2^{+64}}) \\
 &[{0, 2^{+64}}) &\times &2^{-64} &&\mapsto [{0.0, 1.0})
 \end{aligned}
 $
-
+\end{preview}
 \end{document}
