@@ -11,7 +11,7 @@
 //
 //
 // This file contains main(), and it is used for both running the unit tests and
-// for playing around with some example and ideas. This file doesn't have anything
+// for playing around with some examples and ideas. This file doesn't have anything
 // to demonstrate beyond that.
 //
 //
@@ -64,12 +64,12 @@ void sandbox_function()
 	std::printf("period::basic_phi(-0.9, %g) = %g\n", time_offset, period::basic_reverse_phi( 0.9, time_offset));
 	std::printf("period::basic_phi(-1.0, %g) = %g\n", time_offset, period::basic_reverse_phi( 1.0, time_offset));
 
-#endif
-
 	for (int i = 360; i >= -360; i -= 30)
 		std::printf("period::total_phi(%d, %g, %g, %g, %g, %g, %g, %g) = %g\n",
 					i, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset,
 					period::total_reverse_phi(-i, input_time_scale, input_period, input_value_shift, output_period, output_time_shift, output_value_shift, period_offset));
+
+#endif
 
 
 	period::period_converter from_turns_to_centered_degrees{.output_period = 360.0, .output_min = -180.0};
@@ -108,77 +108,6 @@ void sandbox_function()
 
 	// phase shift/amplitude shift/amplitude scaling/period scaling
 }
-
-
-// reversing parameter pack stuff
-
-
-// https://twitter.com/the_whole_daisy/status/1379580525078147072
-// https://godbolt.org/z/h5P1Mxsrz
-// TLDR -- operator precedence ('=' is right to left, ',' is left to right) matters with binary fold expressions.
-//
-//#include <iostream>
-//
-//template <class... Ts>
-//void print_args_backwards(Ts... ts)
-//{
-//	auto print_one = [](auto t)
-//	{
-//		std::cout << t << std::endl;
-//
-//		// Anything with a reasonable assignment operator will work here
-//		return std::type_identity<void>{};
-//	};
-//
-//	// Backwards:
-//	(print_one(ts) = ...);
-//
-//	// Forwards:
-//	(print_one(ts), ...);
-//}
-//
-//int main()
-//{
-//	print_args_backwards(1, 2, "hello", 3, 4, "world");
-//}
-
-
-// https://stackoverflow.com/questions/51408771/c-reversed-integer-sequence-implementation
-//
-//#include <utility>
-//#include <type_traits>
-//
-//template <std::size_t ... Is>
-//constexpr auto indexSequenceReverse (std::index_sequence<Is...> const &)
-//-> decltype( std::index_sequence<sizeof...(Is)-1U-Is...>{} );
-//
-//template <std::size_t N>
-//using makeIndexSequenceReverse = decltype(indexSequenceReverse(std::make_index_sequence<N>{}));
-//
-//int main()
-//{
-//	static_assert( std::is_same<std::index_sequence<4U, 3U, 2U, 1U, 0U>,
-//				   makeIndexSequenceReverse<5U>>::value, "!" );
-//}
-
-
-// https://stackoverflow.com/questions/47303466/compile-time-reversal-of-parameter-pack-expansion
-//
-//template<typename T>
-//struct Test
-//{
-//	template <std::size_t...Is, typename... B>
-//	Test(std::index_sequence<Is...>, B&&... vv) :
-//		b{std::get<sizeof...(Is) - 1 - Is>(std::tie(vv...))...}
-//	{}
-//
-//	public:
-//		template<typename... B>
-//		explicit Test(B... vv) : Test(std::index_sequence_for<B...>{}, vv...) {}
-//	private:
-//		std::byte b[sizeof(T)];
-//};
-
 
 #if defined(__clang__) && (__clang_major__ < 13)
 // clang 10.0 does not like colors on windows (link problems with isatty and fileno)

@@ -1,0 +1,37 @@
+\documentclass[document]{standalone}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{amsmath,amssymb}
+\usepackage[active,tightpage]{preview}
+\begin{document}
+\begin{preview}
+\Large
+
+${\displaystyle _{A}^{B}\textrm{X} \cdot _{}^{A}\textrm{P}= _{}^{B}\textrm{P}}$\\
+${\displaystyle _{A}^{B}\textrm{X}=_{A}^{B}\textrm{T} \cdot _{A}^{B}\textrm{R}}$\\
+${\displaystyle \begin{bmatrix}_{A}^{B}\textrm{X}\end{bmatrix}_{}^{-1}=\begin{bmatrix}_{A}^{B}\textrm{T} \cdot _{A}^{B}\textrm{R}\end{bmatrix}_{}^{-1}=\begin{bmatrix}_{A}^{B}\textrm{R}\end{bmatrix}_{}^{-1} \cdot \begin{bmatrix}_{A}^{B}\textrm{T}\end{bmatrix}_{}^{-1}=_{B}^{A}\textrm{X}}$\\
+${\displaystyle _{A}^{B}\textrm{X} =\begin{bmatrix}
+I & _{}^{B}\textrm{P}_{A origin}^{} \\
+0 & 1 \\
+\end{bmatrix}\begin{bmatrix}
+_{A}^{B}\textrm{R} & 0 \\
+0 & 1 \\
+\end{bmatrix}=\begin{bmatrix}
+_{A}^{B}\textrm{R} & _{}^{B}\textrm{P}_{A origin}^{} \\
+0 & 1 \\
+\end{bmatrix}}$ \\
+${\displaystyle _{B}^{A}\textrm{X}=\begin{bmatrix}
+\begin{bmatrix}
+_{A}^{B}\textrm{R}\end{bmatrix}_{}^{-1} &  0\\
+0 & 1 \\
+\end{bmatrix}\begin{bmatrix}
+I & -_{}^{B}\textrm{P}_{A origin}^{} \\
+0 & 1 \\
+\end{bmatrix}=\begin{bmatrix}
+\begin{bmatrix}
+_{A}^{B}\textrm{R}\end{bmatrix}_{}^{-1} & -\begin{bmatrix}
+_{A}^{B}\textrm{R}\end{bmatrix}_{}^{-1} \cdot _{}^{B}\textrm{P}_{A origin}^{}\\
+0 & 1 \\
+\end{bmatrix}}
+$
+\end{preview}
+\end{document}
