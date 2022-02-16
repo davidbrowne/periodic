@@ -2,14 +2,13 @@
 
 **periodic** is a **c++20 library** that is for exploring things about angles and intervals.
 
-## Possible Topics
-* Binary Angular Measurement (BAM), most likely for 64-bit angles
+## Possible Future Topics
 * Repeating and non-repeating periods
 * Inverses of periods
-* Periodic coordinate systems - e.g., math-centric vs. navigation-centric
 * Turns (as opposed to radians or degrees), and conversions between systems
 * Tau vs. pi
 * Unsigned periods, like [0, 360), vs signed periods [-180, 180)
+* Phi function
 * Phase shift/amplitude shift/amplitude scaling/period scaling, etc.
 * Periodic intervals (and inverse intervals) - animation, easing
 
@@ -18,7 +17,7 @@ We could use floating point numbers to represent angles, such as *double* or *fl
 
 ![bam generic](./svg/bam_generic.svg)
 
-We could use any integral value or bitfield to represent a binary angular measurement to a certain precision, but since *double* is so important to us and is 64 bits in size, we will use an unsigned 64 bit type, *unsigned long long*, as our best way to have as much precision as possible that is most compatible with **double*.
+We could use any integral value or bitfield to represent a binary angular measurement to a certain precision, but since *double* is so important to us and is 64 bits in size, we will use an unsigned 64 bit type, *unsigned long long*, as our best way to have as much precision as possible that is most compatible with *double*. *double* gives us 53 bits precision (including implicit bit), and *unsigned long long* gives use 64 bits precision.
 
 ![bam 64bit](./svg/bam_64bit.svg)
 
@@ -30,20 +29,28 @@ We use the **phi()** function to get our intial value in range, then we use the 
 ![identity and floor](./svg/identity_and_floor.svg) | ![identity and ceil](./svg/identity_and_ceil.svg)
 ---|---|
 
+The floor and ceiling functions are fundamental to our forward and reverse **phi()** function. These allow us to convert to our fundamental period with whatever other decorations (shifts, etc.). They also allow us to convert between periodic coordinate systems.
+
 ### Fundamental Periodic Driver and its Reverse/Inverse(?)
 ![sawtooth](./svg/identity_minus_floor.svg) | ![reverse of sawtooth](./svg/ceil_minus_identity.svg)
 ---|---|
+
+The floor and ceiling functions are applied here to give us the fundamental period, forward and reverse. These are the higher level functions alluded to above for converting to our fundamental period with decorations (e.g., different periods, output shifts, etc.).
+
+By default these have a period of 1, but this can be scaled as necessary.
 
 ### Periodic Coordinate Systems
 People have a lot of experience with 3D coordinate systems, for representing data and transforming data between different coordinate system representations. The data consists of series of rotations that provides a 3D spatial orientation, plus an offset from the coordinate system that this is defined with respect to (e.g.,the world coordinate system).
 
 Periodic systems can also be represented as an orientation and offset (i.e., translation) from a coordinate system that it is defined with respect to. A periodic system can be though of as having **two** orientations; forwards/backwards, clockwise/counter-clockwise, etc. The periodic translation is a value that will make a periodic coordinate system coincide with the system it is defined against. The values used must take into account their period.
 
-To invert a general 3D coordinate system, we can derive the following:
+For the following discussion, we are using a column-major matrix representation, where we pre-multiply transformation matrices to points. Row-major matrix post-multiplication is just as valid, but it is not the convention used here.
+
+To invert a general 3D coordinate system, we can derive the following. Here we have a coordinate transformation from coordinate system *A* to coordinate system *B*, represented by the transformation matrix *X*. When this *X* is multiplied by a point represented in *A*'s coordinate system, it will return the same position but in *B*'s coordinate system:
 
 ![basic coordinate transform](./svg/xform.svg)
 
-This shows the transformation from system *A* to system *B*. It also shows how to derive the inverse transformation from *B* to *A*. We have a rotation matrix *R* which provides the orientation, plus an offset *P* which is *A*'s origin in *B*'s coordinate system.
+This shows the transformation from system *A* to system *B*. *T* is our translation to the offset point. *R* is the orientation to apply to align the two systems. It also shows how to derive the inverse transformation from *B* to *A*. We have a rotation matrix *R* which provides the orientation, plus an offset *P* which is *A*'s origin represented in *B*'s coordinate system.
 
 Our periodic transformations follow the same basic equations, except that instead of having a rotation matrix *R*, we have a single valued orientation *O* that has a value of +/-1. It is +1 if the coordinate systems have the same positive and negative orientation, and it is -1 if the coordinate systems have the opposite orientation. The inverses of the orientation are the same (if you are opposite you stay opposite, if you are the same you stay the same).
 
