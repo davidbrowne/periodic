@@ -31,7 +31,7 @@ We use the **phi()** function to get our intial value in range, then we use the 
 
 The floor and ceiling functions are fundamental to our forward and reverse **phi()** function. These allow us to convert to our fundamental period with whatever other decorations (shifts, etc.). They also allow us to convert between periodic coordinate systems.
 
-### Fundamental Periodic Driver and its Reverse/Inverse(?)
+### Fundamental Periodic Driver and its Reverse
 ![sawtooth](./svg/identity_minus_floor.svg) | ![reverse of sawtooth](./svg/ceil_minus_identity.svg)
 ---|---|
 
@@ -52,7 +52,7 @@ To invert a general 3D coordinate system, we can derive the following. Here we h
 
 This shows the transformation from system *A* to system *B*. *T* is our translation to the offset point. *R* is the orientation to apply to align the two systems. It also shows how to derive the inverse transformation from *B* to *A*. We have a rotation matrix *R* which provides the orientation, plus an offset *P* which is *A*'s origin represented in *B*'s coordinate system.
 
-Our periodic transformations follow the same basic equations, except that instead of having a rotation matrix *R*, we have a single valued orientation *O* that has a value of +/-1. It is +1 if the coordinate systems have the same positive and negative orientation, and it is -1 if the coordinate systems have the opposite orientation. The inverses of the orientation are the same (if you are opposite you stay opposite, if you are the same you stay the same).
+Our periodic transformations follow the same basic equations, except that instead of having a rotation matrix *R*, we have a single valued orientation *&thetav;* that has a value of +/-1. It is +1 if the coordinate systems have the same positive and negative orientation, and it is -1 if the coordinate systems have the opposite orientation. The inverses of the orientation are the same (if you are opposite you stay opposite, if you are the same you stay the same).
 
 ![periodic coordinate transform](./svg/periodic_xform.svg)
 
@@ -61,14 +61,14 @@ These coordinate system translations can be managed with either forward or rever
 #### Bearing Example
 Navigational bearing and mathematical angles are very similar, but they can be considered different coordinate systems. Bearing has its origin in the north, while the 2D plane (used for the unit circle) has its origin in the east. The positive direction for bearing is clockwise, while the positive direction for mathematical angles is counter-clockwise (following the right-hand rule).
 
-Since one is clockwise and the other counter-clockwise, any coordinate transformation is going to have *O* be -1. From the perspective of bearing, the math origin is 1/4 turn along the way in the positive orientation. From the perspective of math angles, the bearing origin is also 1/4 turn along the way in its positive orientation.
+Since one is clockwise and the other counter-clockwise, any coordinate transformation is going to have *&thetav;* be -1. From the perspective of bearing, the math origin is 1/4 turn along the way in the positive orientation. From the perspective of math angles, the bearing origin is also 1/4 turn along the way in its positive orientation.
 
 ![bearing transform](./svg/bearing.svg)
 
 We use *0.25* since in this case, our period is *turns*, but we could use a period of degrees or radians or other periodic unit.
 
 #### Same Orientation Example
-If we took the above example, but we decided to make a bearing also be counter-clockwise, what would that look like? The orientations are the same, so *O* is +1. If the math coordinate system is our **world** periodic system, then the CCW bearing is 1/4 turn along the way. However, the math coordinate system is 1/4 turn backwards from the bearing position, and this leads us to the following transformations (derived from above):
+If we took the above example, but we decided to make a bearing also be counter-clockwise, what would that look like? The orientations are the same, so *&thetav;* is +1. If the math coordinate system is our **world** periodic system, then the CCW bearing is 1/4 turn along the way. However, the math coordinate system is 1/4 turn backwards from the bearing position, and this leads us to the following transformations (derived from above):
 
 ![forward bearing transform](./svg/bearing2.svg)
 

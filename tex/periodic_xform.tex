@@ -1,13 +1,12 @@
-\documentclass[document]{standalone}
+\documentclass[12pt,fleqn]{standalone}
 \renewcommand{\familydefault}{\sfdefault}
 \usepackage{amsmath,amssymb}
 \usepackage[active,tightpage]{preview}
 \begin{document}
 \begin{preview}
-\Large
 
-${\displaystyle _{A}^{B}\textrm{R} = _{A}^{B}\textrm{O}}$\\
-${\displaystyle _{A}^{B}\textrm{O}=\begin{bmatrix}_{A}^{B}\textrm{O}\end{bmatrix}_{}^{-1} = _{B}^{A}\textrm{O}}=\begin{cases} +1, & \text{if same orientation}\  \\
+${\displaystyle _{A}^{B}\textrm{R} = _{A}^{B}{\vartheta}}$\\
+${\displaystyle _{A}^{B}{\vartheta}=\begin{bmatrix}_{A}^{B}{\vartheta}\end{bmatrix}_{}^{-1} = _{B}^{A}{\vartheta}}=\begin{cases} +1, & \text{if same orientation}\  \\
 -1, & \text{if opposite orientation}
 \end{cases}$
 \\
@@ -16,24 +15,25 @@ ${\displaystyle _{A}^{B}\textrm{X} =\begin{bmatrix}
 I & _{}^{B}\textrm{P}_{A origin}^{} \\
 0 & 1 \\
 \end{bmatrix}\begin{bmatrix}
-_{A}^{B}\textrm{O} & 0 \\
+_{A}^{B}{\vartheta} & 0 \\
 0 & 1 \\
 \end{bmatrix}=\begin{bmatrix}
-_{A}^{B}\textrm{O} & _{}^{B}\textrm{P}_{A origin}^{} \\
+_{A}^{B}{\vartheta} & _{}^{B}\textrm{P}_{A origin}^{} \\
 0 & 1 \\
 \end{bmatrix}}$ \\
 
 ${\displaystyle _{B}^{A}\textrm{X}=\begin{bmatrix}
 \begin{bmatrix}
-_{A}^{B}\textrm{O}\end{bmatrix}_{}^{-1} &  0\\
+_{A}^{B}{\vartheta}\end{bmatrix}_{}^{-1} &  0\\
 0 & 1 \\
 \end{bmatrix}\begin{bmatrix}
 I & -_{}^{B}\textrm{P}_{A origin}^{} \\
 0 & 1 \\
-\end{bmatrix}=\begin{bmatrix}
+\end{bmatrix}}$\\
+${\displaystyle _{B}^{A}\textrm{X}=\begin{bmatrix}
 \begin{bmatrix}
-_{A}^{B}\textrm{O}\end{bmatrix}_{}^{-1} & -\begin{bmatrix}
-_{A}^{B}\textrm{O}\end{bmatrix}_{}^{-1} \cdot _{}^{B}\textrm{P}_{A origin}^{}\\
+_{A}^{B}{\vartheta}\end{bmatrix}_{}^{-1} & -\begin{bmatrix}
+_{A}^{B}{\vartheta}\end{bmatrix}_{}^{-1} \cdot _{}^{B}\textrm{P}_{A origin}^{}\\
 0 & 1 \\
 \end{bmatrix}}$
 
