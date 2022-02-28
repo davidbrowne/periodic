@@ -38,7 +38,7 @@
     <ClCompile Include="..\src\nanobench.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\tests\phi_test.cxx">
+    <ClCompile Include="..\tests\convert_test.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

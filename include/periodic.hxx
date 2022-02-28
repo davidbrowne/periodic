@@ -18,16 +18,16 @@
 #include <cmath>					// for cxcm
 
 //
-// periodic
+// periodic coordinate system
 //
 
 // version info
 
 constexpr inline int PERIODIC_MAJOR_VERSION = 0;
-constexpr inline int PERIODIC_MINOR_VERSION = 0;
-constexpr inline int PERIODIC_PATCH_VERSION = 2;
+constexpr inline int PERIODIC_MINOR_VERSION = 1;
+constexpr inline int PERIODIC_PATCH_VERSION = 0;
 
-namespace period
+namespace pcs
 {
 	namespace cxcm
 	{
@@ -963,65 +963,32 @@ namespace period
 
 	} // namespace cxcm
 
+
 	// 2* pi = tau
 	// https://tauday.com/tau-manifesto
 	template <std::floating_point T>
 	constexpr inline T tau = T(2 * std::numbers::pi_v<T>);
 
-	// period of 1
-	constexpr double sawtooth(double input) noexcept
+	// input_value is value to convert
+	// output_origin is the origin of the output pcs in input pcs coords, so therefore in input_period
+	// input period is period of input-related values
+	// output_min is the minimum value of output range, where range => [output_min, output_min + period)
+	constexpr double forward_convert(double input_value, double output_origin, double input_period, double output_min, double output_period) noexcept
 	{
-		return input - cxcm::floor(input);
+		double norm_input = (input_value + output_origin) / input_period;
+		double norm_minimim_output = output_min / output_period;
+		return output_period * (norm_input - cxcm::floor(norm_input - norm_minimim_output));
 	}
 
-	// a double value is reduced to a value in range [0.0, 1.0).
-	// if you imagine the number line, represented by a double,
-	// where you only care about the fractional part, and if that
-	// fractional part is negative then add 1.0.
-	constexpr double normalize_input(double input) noexcept
+	// input_value is value to convert
+	// output_origin is the origin of the output pcs in input pcs coords, so therefore in input_period
+	// input period is period of input-related values
+	// output_min is the minimum value of output range, where range => [output_min, output_min + period)
+	constexpr double reverse_convert(double input_value, double output_origin, double input_period, double output_min, double output_period) noexcept
 	{
-		return sawtooth(input);
-	}
-
-	// input period == 1, output period == 1, range [0, 1)
-	constexpr double basic_phi(double val) noexcept
-	{
-		return val - cxcm::floor(val);
-	}
-
-	// input period == 1, output period == 1, range [time_shift, time_shift + 1)
-	constexpr double basic_phi(double val, double time_shift) noexcept
-	{
-		return val - cxcm::floor(val - time_shift);
-	}
-
-	constexpr double total_phi(double input_val, double input_time_scale, double input_period, double input_value_shift,
-							   double output_period, double output_min, double output_value_shift,
-							   double period_offset) noexcept
-	{
-		return output_period * (((input_time_scale * (input_val - input_value_shift) / input_period) + (period_offset / output_period)) -
-								cxcm::floor(((input_time_scale * (input_val - input_value_shift) / input_period) + (period_offset / output_period)) -
-								(output_min / output_period))) + output_value_shift;
-	}
-
-	// input period == 1, output period == 1, range [0, 1)
-	constexpr double basic_reverse_phi(double val) noexcept
-	{
-		return cxcm::ceil(val) - val;
-	}
-
-	// input period == 1, output period == 1, range [time_shift, time_shift + 1)
-	constexpr double basic_reverse_phi(double val, double time_shift) noexcept
-	{
-		return cxcm::ceil(val + time_shift) - val;
-	}
-
-	constexpr double total_reverse_phi(double input_val, double input_time_scale, double input_period, double input_value_shift,
-									   double output_period, double output_min, double output_value_shift,
-									   double period_offset) noexcept
-	{
-		return output_period * (cxcm::ceil(((input_time_scale * (input_val - input_value_shift) / input_period) - (period_offset / output_period)) + (output_min / output_period)) -
-								((input_time_scale * (input_val - input_value_shift) / input_period) - (period_offset / output_period))) + output_value_shift;
+		double norm_input = (input_value - output_origin) / input_period;
+		double norm_minimim_output = output_min / output_period;
+		return output_period * (cxcm::ceil(norm_input + norm_minimim_output) - norm_input);
 	}
 
 	// there are so many parameters depending on the input and output situations.
@@ -1030,53 +997,58 @@ namespace period
 	// the forward or reverse period conversion on the input value.
 
 	// normal forward conversion
-	struct period_converter
+	struct forward_period_converter
 	{
-		double input_scale = 1.0;	// scale factor: < 0 means time reversal, 0 < abs(x) < 1 means expansion, abs(x) > 1 means compression -- a.k.a. time scale
-		double input_period = 1.0;	// the period of the input values, < 0 means time reversal if input_scale > 0
-		double output_period = 1.0;	// the period of the output values, should be > 0 0 -- a.k.a. amplitude scale
-		double period_offset = 0.0;	// amount to periodically offset the output value by, values using the output period
-		double output_min = 0.0;	// the minimum of the output range, values using the output period -- a.k.a. time shift
-		double output_shift = 0.0;	// amount to linearly shift the output by -- a.k.a. amplitude shift
-		double input_shift = 0.0;	// amount to linearly shift the input by
+		double input_period = 1.0;	// the period of the input values
+		double output_period = 1.0;	// the period of the output values
+		double output_origin = 0.0;	// the output origin in input_period units
+		double output_min = 0.0;	// the minimum of the output range, in output_period units
 
 		// 
-		constexpr double operator()(double input_val) const noexcept
+		constexpr double operator()(double input_value) const noexcept
 		{
-			return total_phi(input_val, input_scale, input_period, input_shift, output_period, output_min, output_shift, period_offset);
+			return forward_convert(input_value, output_origin, input_period, output_min, output_period);
 		}
 
 		// 
-		constexpr double reverse(double input_val) const noexcept
+		constexpr double forward(double input_value) const noexcept
 		{
-			return total_reverse_phi(input_val, input_scale, input_period, input_shift, output_period, output_min, output_shift, period_offset);
+			return forward_convert(input_value, output_origin, input_period, output_min, output_period);
+		}
+
+		// 
+		constexpr double reverse(double input_value) const noexcept
+		{
+			return reverse_convert(input_value, output_origin, input_period, output_min, output_period);
 		}
 	};
 
 	// normal reverse conversion
 	struct reverse_period_converter
 	{
-		double input_scale = 1.0;	// scale factor: < 0 means time reversal, 0 < abs(x) < 1 means expansion, abs(x) > 1 means compression -- a.k.a. time scale
-		double input_period = 1.0;	// the period of the input values, < 0 means time reversal if input_scale > 0
-		double output_period = 1.0;	// the period of the output values, < 0 means amplitude reversal -- a.k.a. amplitude scale
-		double period_offset = 0.0;	// amount to periodically offset the output value by, values using the output period
-		double output_min = 0.0;	// the minimum of the output range, values using the output period -- a.k.a. time shift
-		double output_shift = 0.0;	// amount to linearly shift the output by -- a.k.a. amplitude shift
-		double input_shift = 0.0;	// amount to linearly shift the input by
+		double input_period = 1.0;	// the period of the input values
+		double output_period = 1.0;	// the period of the output values
+		double output_origin = 0.0;	// the output origin in input_period units
+		double output_min = 0.0;	// the minimum of the output range, in output_period units
 
 		// 
-		constexpr double operator()(double input_val) const noexcept
+		constexpr double operator()(double input_value) const noexcept
 		{
-			return total_reverse_phi(input_val, input_scale, input_period, input_shift, output_period, output_min, output_shift, period_offset);
+			return reverse_convert(input_value, output_origin, input_period, output_min, output_period);
 		}
 
 		// 
-		constexpr double reverse(double input_val) const noexcept
+		constexpr double forward(double input_value) const noexcept
 		{
-			return total_phi(input_val, input_scale, input_period, input_shift, output_period, output_min, output_shift, period_offset);
+			return reverse_convert(input_value, output_origin, input_period, output_min, output_period);
+		}
+
+		// 
+		constexpr double reverse(double input_value) const noexcept
+		{
+			return forward_convert(input_value, output_origin, input_period, output_min, output_period);
 		}
 	};
-
 
 
 	// 64-bit binary angular measurement.
@@ -1106,7 +1078,7 @@ namespace period
 
 		static constexpr bam64 from_turns(double turns) noexcept
 		{
-			return bam64{ .value = static_cast<unsigned long long>(normalize_input(turns) * unit_period_to_bam) };
+			return bam64{ .value = static_cast<unsigned long long>(cxcm::fract(turns) * unit_period_to_bam) };
 		}
 
 		static constexpr bam64 from_degrees(double degrees) noexcept
@@ -1168,7 +1140,7 @@ namespace period
 
 	};
 
-}	// namespace period
+}	// namespace pcs
 
 
 // closing include guard
