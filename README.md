@@ -45,31 +45,35 @@ What would it look like changing the above example for bearing to also be counte
 
 In order to perform the conversions betwen coordinate systems, there are two functions that will be used, one for forward conversions (where the orientation is the same) and the other for reverse conversions (where the orientations are the opposite). These functions also allow for the setting of where the fundamental period should start, e.g., -180 for a degree period instead of 0.
 
-```c++
-// input_value is value to convert
-// output_origin is the origin of the output pcs in input pcs coords, so therefore in input_period
-// input period is period of input-related values
-// output_min is the minimum value of output range, where range => [output_min, output_min + period)
-constexpr double forward_convert(double input_value, double output_origin, double input_period,
-				 double output_min, double output_period) noexcept
-{
-	double norm_input = (input_value + output_origin) / input_period;
-	double norm_minimim_output = output_min / output_period;
-	return output_period * (norm_input - cxcm::floor(norm_input - norm_minimim_output));
-}
+Two functions aren't required to perform the forward and backward conversions. Only one of these functions is needed, and the other result occurs when the input is negated.
 
-```
 ```c++
 // input_value is value to convert
-// output_origin is the origin of the output pcs in input pcs coords, so therefore in input_period
 // input period is period of input-related values
+// input_origin is the origin of the input pcs in output pcs coords, so therefore in output_period
 // output_min is the minimum value of output range, where range => [output_min, output_min + period)
-constexpr double reverse_convert(double input_value, double output_origin, double input_period,
+// output_period is the period of output-related values, and is a scale factor on the output
+constexpr double forward_convert(double input_value, double input_period, double input_origin,
 				 double output_min, double output_period) noexcept
 {
-	double norm_input = (input_value - output_origin) / input_period;
-	double norm_minimim_output = output_min / output_period;
-	return output_period * (cxcm::ceil(norm_input + norm_minimim_output) - norm_input);
+	double norm_input = (input_value / input_period) + (input_origin / output_period);
+	double norm_minimum_output = output_min / output_period;
+	return output_period * (norm_input - cxcm::floor(norm_input - norm_minimum_output));
+}
+```
+
+```c++
+// input_value is value to convert
+// input period is period of input-related values
+// input_origin is the origin of the input pcs in output pcs coords, so therefore in output_period
+// output_min is the minimum value of output range, where range => [output_min, output_min + period)
+// output_period is the period of output-related values, and is a scale factor on the output
+constexpr double reverse_convert(double input_value, double input_period, double input_origin,
+				 double output_min, double output_period) noexcept
+{
+	double norm_input = (input_value / input_period) - (input_origin / output_period);
+	double norm_minimum_output = output_min / output_period;
+	return output_period * (cxcm::ceil(norm_input + norm_minimum_output) - norm_input);
 }
 ```
 
