@@ -1,4 +1,4 @@
-# periodic - exploring angles and intervals
+# periodic - exploring periodic coordinate systems and angles
 
 **periodic** is a c++20 project that is for exploring things about periodic coordinate systems, especially thinking about angles.
 
@@ -51,13 +51,16 @@ Two functions aren't required to perform the forward and backward conversions. O
 // input_value is value to convert
 // input period is period of input-related values
 // input_origin is the origin of the input pcs in output pcs coords, so therefore in output_period
-// output_min is the minimum value of output range, where range => [output_min, output_min + period)
+// output_min is the min value of output range, where range => [output_min, output_min + output_period)
 // output_period is the period of output-related values, and is a scale factor on the output
 constexpr double forward_convert(double input_value, double input_period, double input_origin,
 				 double output_min, double output_period) noexcept
 {
+	// normalize parameters to period == 1
 	double norm_input = (input_value / input_period) + (input_origin / output_period);
 	double norm_minimum_output = output_min / output_period;
+
+	// scale output by output_period
 	return output_period * (norm_input - cxcm::floor(norm_input - norm_minimum_output));
 }
 ```
@@ -66,13 +69,17 @@ constexpr double forward_convert(double input_value, double input_period, double
 // input_value is value to convert
 // input period is period of input-related values
 // input_origin is the origin of the input pcs in output pcs coords, so therefore in output_period
-// output_min is the minimum value of output range, where range => [output_min, output_min + period)
+// output_min is the min value of output range, where range => [output_min, output_min + output_period)
 // output_period is the period of output-related values, and is a scale factor on the output
 constexpr double reverse_convert(double input_value, double input_period, double input_origin,
 				 double output_min, double output_period) noexcept
 {
+	// normalize parameters to period == 1
 	double norm_input = (input_value / input_period) - (input_origin / output_period);
 	double norm_minimum_output = output_min / output_period;
+
+
+	// scale output by output_period
 	return output_period * (cxcm::ceil(norm_input + norm_minimum_output) - norm_input);
 }
 ```

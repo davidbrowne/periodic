@@ -11,7 +11,7 @@ TEST_SUITE("test pcs")
 		constexpr auto output_period = 1.0;						// output period
 		constexpr auto output_min = -0.5;						// minimum value of periodic output range
 		constexpr auto input_period = 1.0;						// input period
-		constexpr auto input_origin = 0.0;						// input origin in output units
+		constexpr auto input_origin = 0.25;						// input origin in output units
 
 		SUBCASE("forward/reverse equality with reverse inputs")
 		{

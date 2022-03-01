@@ -972,24 +972,30 @@ namespace pcs
 	// input_value is value to convert
 	// input period is period of input-related values
 	// input_origin is the origin of the input pcs in output pcs coords, so therefore in output_period
-	// output_min is the minimum value of output range, where range => [output_min, output_min + period)
+	// output_min is the min value of output range, where range => [output_min, output_min + output_period)
 	// output_period is the period of output-related values, and is a scale factor on the output
 	constexpr double forward_convert(double input_value, double input_period, double input_origin, double output_min, double output_period) noexcept
 	{
+		// normalize parameters to period == 1
 		double norm_input = (input_value / input_period) + (input_origin / output_period);
 		double norm_minimum_output = output_min / output_period;
+
+		// scale output by output_period
 		return output_period * (norm_input - cxcm::floor(norm_input - norm_minimum_output));
 	}
 
 	// input_value is value to convert
 	// input period is period of input-related values
 	// input_origin is the origin of the input pcs in output pcs coords, so therefore in output_period
-	// output_min is the minimum value of output range, where range => [output_min, output_min + period)
+	// output_min is the min value of output range, where range => [output_min, output_min + output_period)
 	// output_period is the period of output-related values, and is a scale factor on the output
 	constexpr double reverse_convert(double input_value, double input_period, double input_origin, double output_min, double output_period) noexcept
 	{
+		// normalize parameters to period == 1
 		double norm_input = (input_value / input_period) - (input_origin / output_period);
 		double norm_minimum_output = output_min / output_period;
+
+		// scale output by output_period
 		return output_period * (cxcm::ceil(norm_input + norm_minimum_output) - norm_input);
 	}
 
@@ -1003,13 +1009,13 @@ namespace pcs
 	{
 		double input_period = 1.0;	// the period of the input values
 		double output_period = 1.0;	// the period of the output values
-		double input_origin = 0.0;	// the input origin in output_period units
+		double input_origin = 0.0;	// the input origin in output_period units (i.e., in output pcs coords)
 		double output_min = 0.0;	// the minimum of the output range, in output_period units
 
 		// 
 		constexpr double operator()(double input_value) const noexcept
 		{
-			return forward_convert(input_value, input_period, input_origin, output_min, output_period);
+			return forward(input_value);
 		}
 
 		// 
@@ -1030,13 +1036,13 @@ namespace pcs
 	{
 		double input_period = 1.0;	// the period of the input values
 		double output_period = 1.0;	// the period of the output values
-		double input_origin = 0.0;	// the input origin in output_period units
+		double input_origin = 0.0;	// the input origin in output_period units (i.e., in output pcs coords)
 		double output_min = 0.0;	// the minimum of the output range, in output_period units
 
 		// 
 		constexpr double operator()(double input_value) const noexcept
 		{
-			return reverse_convert(input_value, input_period, input_origin, output_min, output_period);
+			return forward(input_value);
 		}
 
 		// 
