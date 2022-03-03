@@ -1,6 +1,10 @@
 # periodic - exploring periodic coordinate systems and angles
 
-**periodic** is a c++20 project that is for exploring things about periodic coordinate systems, especially thinking about angles.
+## tl;dr
+
+* Converting between different angle/periodic repesentations and offsets
+* A possible angle representation called BAM
+* Some math stuff which hopefully gets things right
 
 ## Topics Of Interest
 
@@ -116,7 +120,7 @@ Floating point numbers could be used to represent angles, such as *double* or *f
 
 Values between 0 and 1 are normalized and scalable. Since BAM is about angular measurement, these values also match the concept of a **turn** as a unit of period (period is length 1), which is one of the reasons the [symbol &tau; (tau)](https://tauday.com/tau-manifesto) was chosen to represent a full turn (in radians). A BAM value could also be used generally for a period that is not angle-related.
 
-The ```fract()``` function gives the positive remainder of a floating-point value. If the number is negative, then the fractional part is added to 1 to give the value. There are several ways to do this, but ```sawtooth()``` as given in the graph below provides a sort of periodic identity function. The problem is using the [double](https://en.wikipedia.org/wiki/Double-precision_floating-point_format) representation for arbitrary values between 0 and 1.
+The ```fract()``` function gives the positive remainder of a floating-point value. If the number is negative, then the fractional part is added to 1 to give the value. There are several ways to do this, but ```sawtooth()``` provides a sort of periodic identity function. The problem is using the [double](https://en.wikipedia.org/wiki/Double-precision_floating-point_format) representation for arbitrary values between 0 and 1.
 
 [Subnormal numbers](https://en.wikipedia.org/wiki/Subnormal_number) arise in this range, so the precision varies considerably the closer a value gets to 0. Switching to an integral BAM representation can help deal with some of these issues. The original double value still needs to be  converted to a value between 0 and 1, but then it can be converted to the integral representation for further manipulation.
 
