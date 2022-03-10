@@ -977,8 +977,8 @@ namespace pcs
 	constexpr double forward_convert(double input_value, double input_period, double input_origin, double output_min, double output_period) noexcept
 	{
 		// normalize parameters to period == 1
-		double norm_input = (input_value / input_period) + (input_origin / output_period);
-		double norm_minimum_output = output_min / output_period;
+		const double norm_input = (input_value / input_period) + (input_origin / output_period);
+		const double norm_minimum_output = output_min / output_period;
 
 		// scale output by output_period
 		return output_period * (norm_input - cxcm::floor(norm_input - norm_minimum_output));
@@ -992,8 +992,8 @@ namespace pcs
 	constexpr double reverse_convert(double input_value, double input_period, double input_origin, double output_min, double output_period) noexcept
 	{
 		// normalize parameters to period == 1
-		double norm_input = (input_value / input_period) - (input_origin / output_period);
-		double norm_minimum_output = output_min / output_period;
+		const double norm_input = (input_value / input_period) - (input_origin / output_period);
+		const double norm_minimum_output = output_min / output_period;
 
 		// scale output by output_period
 		return output_period * (cxcm::ceil(norm_input + norm_minimum_output) - norm_input);
@@ -1019,13 +1019,13 @@ namespace pcs
 		}
 
 		// 
-		constexpr double forward(double input_value) const noexcept
+		[[nodiscard]] constexpr double forward(double input_value) const noexcept
 		{
 			return forward_convert(input_value, input_period, input_origin, output_min, output_period);
 		}
 
 		// 
-		constexpr double reverse(double input_value) const noexcept
+		[[nodiscard]] constexpr double reverse(double input_value) const noexcept
 		{
 			return reverse_convert(input_value, input_period, input_origin, output_min, output_period);
 		}
@@ -1046,13 +1046,13 @@ namespace pcs
 		}
 
 		// 
-		constexpr double forward(double input_value) const noexcept
+		[[nodiscard]] constexpr double forward(double input_value) const noexcept
 		{
 			return reverse_convert(input_value, input_period, input_origin, output_min, output_period);
 		}
 
 		// 
-		constexpr double reverse(double input_value) const noexcept
+		[[nodiscard]] constexpr double reverse(double input_value) const noexcept
 		{
 			return forward_convert(input_value, input_period, input_origin, output_min, output_period);
 		}
@@ -1099,17 +1099,17 @@ namespace pcs
 			return from_turns(radians / tau<double>);
 		}
 
-		constexpr double to_turns() const noexcept
+		[[nodiscard]] constexpr double to_turns() const noexcept
 		{
 			return this->value * bam_to_unit_period;
 		}
 
-		constexpr double to_degrees() const noexcept
+		[[nodiscard]] constexpr double to_degrees() const noexcept
 		{
 			return 360.0 * to_turns();
 		}
 
-		constexpr double to_radians() const noexcept
+		[[nodiscard]] constexpr double to_radians() const noexcept
 		{
 			return tau<double> * to_turns();
 		}
