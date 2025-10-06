@@ -179,6 +179,9 @@
     <ClCompile Include="..\src\nanobench.cxx" />
     <ClCompile Include="..\tests\convert_test.cxx" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="periodic.natvis" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

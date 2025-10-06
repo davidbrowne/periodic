@@ -1,4 +1,4 @@
-//          Copyright David Browne 2021-2022.
+//          Copyright David Browne 2021-2024.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -1059,6 +1059,13 @@ namespace pcs
 	};
 
 
+	template <typename E>
+	requires std::is_enum_v<E>
+	[[nodiscard]] constexpr std::underlying_type_t<E> to_underlying(E e) noexcept
+	{
+		return static_cast<std::underlying_type_t<E>>(e);
+	}
+	
 	// 64-bit binary angular measurement.
 	// this is a position, not a quantity.
 	// size comparison makes no sense.
@@ -1067,22 +1074,32 @@ namespace pcs
 	// angle, not linear, i.e., we couldn't represent more than one swept turn
 	struct bam64
 	{
+		// the bam value
 		unsigned long long value;
 
+		// format converters used for going to or from bam format
 		static constexpr double unit_period_to_bam = 0x1p64;
 		static constexpr double bam_to_unit_period = 0x1p-64;
 
-		static constexpr unsigned long long zero_turn			{ 0x0000000000000000 };
-		static constexpr unsigned long long quarter_turn		{ 0x4000000000000000 };
-		static constexpr unsigned long long half_turn			{ 0x8000000000000000 };
-		static constexpr unsigned long long three_quarter_turn	{ 0xC000000000000000 };
-		static constexpr unsigned long long eighth_turn			{ 0x2000000000000000 };
-		static constexpr unsigned long long sixteenth_turn		{ 0x1000000000000000 };
-		static constexpr unsigned long long thirty_second_turn	{ 0x0800000000000000 };
-		static constexpr unsigned long long sixty_fourth_turn	{ 0x0400000000000000 };
-
-		static constexpr unsigned long long radian_turn			{ 0x28be60db93910600 };
-		static constexpr unsigned long long degree_turn			{ 0x00b60b60b60b60b8 };
+		// bam values for partial parts of a turn, where a turn represents 360 degrees, 2*pi radians, etc.
+		enum turn : unsigned long long
+		{
+			full =			0x0000000000000000,
+			three_quarter =	0xC000000000000000,
+			half =			0x8000000000000000,
+			third =			0x5555555555555400,
+			fourth =		0x4000000000000000,
+			fifth =			0x3333333333333400,
+			sixth =			0x2AAAAAAAAAAAAA00,
+			eighth =		0x2000000000000000,
+			twelfth =		0x1555555555555500,
+			fifteenth =		0x1111111111111100,
+			sixteenth =		0x1000000000000000,
+			thirty_second =	0x0800000000000000,
+			sixty_fourth =	0x0400000000000000,
+			radian =		0x28be60db93910600,
+			degree =		0x00b60b60b60b60b8
+		};
 
 		static constexpr bam64 from_turns(double turns) noexcept
 		{
@@ -1091,27 +1108,77 @@ namespace pcs
 
 		static constexpr bam64 from_degrees(double degrees) noexcept
 		{
-			return from_turns(degrees / 360.0);
+			bam64 raw = from_turns(cxcm::abs(degrees) / 360.0);
+			if (degrees < 0)
+			{
+				return ~raw;
+			}
+			else
+			{
+				return raw;
+			}
 		}
 
 		static constexpr bam64 from_radians(double radians) noexcept
 		{
-			return from_turns(radians / tau<double>);
+			bam64 raw = from_turns(cxcm::abs(radians) / tau<double>);
+			if (radians < 0)
+			{
+				return ~raw;
+			}
+			else
+			{
+				return raw;
+			}
 		}
 
-		[[nodiscard]] constexpr double to_turns() const noexcept
+		[[nodiscard]] constexpr double turns() const noexcept
 		{
 			return this->value * bam_to_unit_period;
 		}
 
-		[[nodiscard]] constexpr double to_degrees() const noexcept
+		[[nodiscard]] constexpr double degrees_full() const noexcept
 		{
-			return 360.0 * to_turns();
+			return 360.0 * turns();
 		}
 
-		[[nodiscard]] constexpr double to_radians() const noexcept
+		[[nodiscard]] constexpr double degrees_comp() const noexcept
 		{
-			return tau<double> * to_turns();
+			return -360.0 * (~(*this)).turns();
+		}
+
+		[[nodiscard]] constexpr double degrees_norm() const noexcept
+		{
+			if (this->value > turn::half)
+			{
+				return degrees_comp();
+			}
+			else
+			{
+				return degrees_full();
+			}
+		}
+
+		[[nodiscard]] constexpr double radians_full() const noexcept
+		{
+			return tau<double> * turns();
+		}
+
+		[[nodiscard]] constexpr double radians_comp() const noexcept
+		{
+			return -tau<double> * (~(*this)).turns();
+		}
+
+		[[nodiscard]] constexpr double radians_norm() const noexcept
+		{
+			if (this->value > turn::half)
+			{
+				return radians_comp();
+			}
+			else
+			{
+				return radians_full();
+			}
 		}
 
 		// relies on unsigned overflow
