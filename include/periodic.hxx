@@ -1066,152 +1066,188 @@ namespace pcs
 		return static_cast<std::underlying_type_t<E>>(e);
 	}
 	
-	// 64-bit binary angular measurement.
-	// this is a position, not a quantity.
-	// size comparison makes no sense.
+	// 64-bit binary angular measurement (bam).
+	// a bam has 64 bits of precision, while a double has only 53 bits of precision,
+	// which means that multiple adjacent bam values can map to a single double value.
+	// this is a position, not a quantity. size comparison makes no sense.
 	// distance between values can make sense, but what units? bam is not a quantity.
 	// but can we use the same representation for a swept angle -- but a periodic swept
-	// angle, not linear, i.e., we couldn't represent more than one swept turn
+	// angle, not linear, i.e., we can't represent any whole number of periods, just a fractional part.
+	// a full period puts you back to 0.
+	//
+	// a bam represents a fractional part of a complete period.
+	//   1 turn    is a complete period
+	// 360 degrees is a complete period
+	// 2pi radians is a complete period
 	struct bam64
 	{
-		// the bam value
-		unsigned long long value;
+		private:
+			// format converters used for going to or from bam format
+			static constexpr double unit_period_to_bam = 0x1p64;			// a multiplier constant used to create a bam from a fractional value in [0.0, 1.0)
+			static constexpr double bam_to_unit_period = 0x1p-64;			// a multiplier constant used to create a [0.0, 1.0) value from a bam
+			static constexpr double degree_base = 360.0;					// 360 degrees
+			static constexpr double radian_base = 6.2831853071795862;		// 2pi radians
 
-		// format converters used for going to or from bam format
-		static constexpr double unit_period_to_bam = 0x1p64;
-		static constexpr double bam_to_unit_period = 0x1p-64;
+		public:
+			// the bam value
+			unsigned long long value;
 
-		// bam values for partial parts of a turn, where a turn represents 360 degrees, 2*pi radians, etc.
-		enum turn : unsigned long long
-		{
-			full =			0x0000000000000000,
-			three_quarter =	0xC000000000000000,
-			half =			0x8000000000000000,
-			third =			0x5555555555555400,
-			fourth =		0x4000000000000000,
-			fifth =			0x3333333333333400,
-			sixth =			0x2AAAAAAAAAAAAA00,
-			eighth =		0x2000000000000000,
-			twelfth =		0x1555555555555500,
-			fifteenth =		0x1111111111111100,
-			sixteenth =		0x1000000000000000,
-			thirty_second =	0x0800000000000000,
-			sixty_fourth =	0x0400000000000000,
-			radian =		0x28be60db93910600,
-			degree =		0x00b60b60b60b60b8
-		};
+			// whether you are trying make a bam from a turn, degree, or radian value, all the whole amounts of
+			// whichever representation you are using, it will use the fraction of the value for making the bam value.
 
-		static constexpr bam64 from_turns(double turns) noexcept
-		{
-			return bam64{ .value = static_cast<unsigned long long>(cxcm::fract(turns) * unit_period_to_bam) };
-		}
+			// "whole" is a whole number of full periods, and "frac" is the fractional part of a full period:
+			// 
+			// bam64::from_turns  ((whole * 1)   + frac_turns) == bam::64::from_turns(frac_turns),		 frac_turns in range (-1, 1)
+			// bam64::from_degrees((whole * 360) + frac_degrees) == bam::64::from_degrees(frac_degrees), frac_degrees in range (-360, 360)
+			// bam64::from_radians((whole * 2pi) + frac_radians) == bam::64::from_radians(frac_radians), frac_radians in range (-2pi, 2pi)
+			//
+			// negative values are allowed, and they will wrap around correctly.
+			// For example, -90 degrees is the same as +270 degrees, and both will produce the same bam value.
+			// 
+			//-----------------------------------------------------------------------------------------------------
+			//		bam value			name						turns 		   degrees				 pi radians
+			//-----------------------------------------------------------------------------------------------------
+			// 0x0000000000000000		none						0				  0						0
+			// 0x0000000000000000		whole						1				360						2
+			// 0xf000000000000000		fifteensixteenths			15/16			337.5					15/8
+			// 0xeaaaaaaaaaaaa800		eleventwelfths				11/12			330						11/6
+			// 0xe000000000000000		seveneighths				7/8				315						7/4
+			// 0xd555555555555800		fivesixths					5/6				300						5/3
+			// 0xd000000000000000		thirteensixteenths			13/16			292.5					13/8
+			// 0xc000000000000000		threefourths				3/4				270						3/2
+			// 0xb000000000000000		elevensixteenths			11/16			247.5					11/8
+			// 0xaaaaaaaaaaaaa800		twothirds					2/3				240						4/3
+			// 0xa000000000000000		fiveeighths					5/8				225						5/4
+			// 0x9555555555555800		seventwelfths				7/12			210						7/6
+			// 0x9000000000000000		ninesixteenths				9/16			202.5					9/8
+			// 0x8000000000000000		half						1/2				180						1
+			// 0x7000000000000000		sevensixteenths				7/16			157.5					7/8
+			// 0x6aaaaaaaaaaaac00		fivetwelfths				5/12			150						5/6
+			// 0x6000000000000000		threeeighths				3/8				135						3/4
+			// 0x5555555555555400		third						1/3				120						2/3
+			// 0x5000000000000000		fivesixteenths				5/16			112.5					5/8
+			// 0x4000000000000000		fourth						1/4				 90						1/2
+			// 0x3333333333333400		fifth						1/5				 72						2/5
+			// 0x3000000000000000		threesixteenths				3/16			 67.5					3/8
+			// 0x2aaaaaaaaaaaaa00		sixth						1/6				 60						1/3
+			// 0x2000000000000000		eighth						1/8				 45						1/4
+			// 0x1999999999999a00		tenth						1/10			 36						1/5
+			// 0x1555555555555500		twelfth						1/12			 30						1/6
+			// 0x1111111111111100		fifteenth					1/15			 24						2/15
+			// 0x1000000000000000		sixteenth					1/16			 22.5					1/8
+			// 0x0e38e38e38e38e00		eighteenth					1/18			 20						1/9
+			// 0x0ccccccccccccd00		twentieth					1/20			 18						1/10
+			// 0x0aaaaaaaaaaaaa80		twentyfourth				1/24			 15						1/12
+			// 0x0888888888888880		thirtieth					1/30			 12						1/15
+			// 0x0800000000000000		thirtysecond				1/32			 11.25					1/16
+			// 0x071c71c71c71c700		thirtysixth					1/36			 10						1/18
+			// 0x05b05b05b05b05c0		fourtyfifth					1/45			  8						2/45
+			// 0x0555555555555540		fourtyeighth				1/48			  7.5					1/24
+			// 0x0444444444444440		sixtieth					1/60			  6						1/30
+			// 0x0400000000000000		sixtyfourth					1/64			  5.625					1/32
+			// 0x038e38e38e38e380		seventysecond				1/72			  5						1/36
+			// 0x02d82d82d82d82e0		ninetieth					1/90			  4						1/45
+			// 0x0222222222222220		hundredtwentieth			1/120			  3						1/60
+			// 0x016c16c16c16c170		hundredeightieth			1/180			  2						1/90
+			// 0x0111111111111110		twohundredfortieth			1/240			  1.5					1/120
+			// 0x00b60b60b60b60b8		threehundredsixtieth		1/360			  1						1/180
+			// 
+			// 0x28be60db93910600		radian						1/2pi			 57.295779513082323		1/pi
+			// 0x00b60b60b60b60b8		degree						1/360			  1						1/180
 
-		static constexpr bam64 from_degrees(double degrees) noexcept
-		{
-			bam64 raw = from_turns(cxcm::abs(degrees) / 360.0);
-			if (degrees < 0)
+
+			// bam values are fractional parts of a period, where a period is 1 turn, 360 degrees, 2pi radians, etc.
+			enum : unsigned long long
 			{
-				return ~raw;
-			}
-			else
+				none =			0x0000000000000000,
+				whole =			0x0000000000000000,
+				three_fourths =	0xc000000000000000,
+				two_thirds =	0xaaaaaaaaaaaaa800,
+				half =			0x8000000000000000,
+				third =			0x5555555555555400,
+				fourth =		0x4000000000000000,
+				fifth =			0x3333333333333400,
+				sixth =			0x2aaaaaaaaaaaaa00,
+				eighth =		0x2000000000000000,
+				twelfth =		0x1555555555555500,
+				fifteenth =		0x1111111111111100,
+				sixteenth =		0x1000000000000000,
+				twenty_fourth = 0x0aaaaaaaaaaaaa80,
+				thirtieth =		0x0888888888888880,
+				thirty_second =	0x0800000000000000,
+				fourty_eighth = 0x0555555555555540,
+				sixtieth =		0x0444444444444440,
+				sixty_fourth =	0x0400000000000000,
+
+				radian =		0x28be60db93910600,
+				degree =		0x00b60b60b60b60b8
+			};
+
+			static constexpr bam64 from_bam_value(unsigned long long bam_value) noexcept
 			{
-				return raw;
+				return bam64{ .value = bam_value };
 			}
-		}
 
-		static constexpr bam64 from_radians(double radians) noexcept
-		{
-			bam64 raw = from_turns(cxcm::abs(radians) / tau<double>);
-			if (radians < 0)
+			static constexpr bam64 from_turns(double turns) noexcept
 			{
-				return ~raw;
+				double fract_turns = cxcm::fract(turns);
+				if (fract_turns < 0)	{ fract_turns += 1.0; }
+				return bam64{ .value = static_cast<unsigned long long>(fract_turns * bam64::unit_period_to_bam) };
 			}
-			else
+
+			static constexpr bam64 from_degrees(double degrees) noexcept
 			{
-				return raw;
+				bam64 raw = from_turns(cxcm::abs(degrees) / degree_base);
+				return (degrees < 0) ? -raw : raw;
 			}
-		}
 
-		[[nodiscard]] constexpr double turns() const noexcept
-		{
-			return this->value * bam_to_unit_period;
-		}
-
-		[[nodiscard]] constexpr double degrees_full() const noexcept
-		{
-			return 360.0 * turns();
-		}
-
-		[[nodiscard]] constexpr double degrees_comp() const noexcept
-		{
-			return -360.0 * (~(*this)).turns();
-		}
-
-		[[nodiscard]] constexpr double degrees_norm() const noexcept
-		{
-			if (this->value > turn::half)
+			static constexpr bam64 from_radians(double radians) noexcept
 			{
-				return degrees_comp();
+				bam64 raw = from_turns(cxcm::abs(radians) / radian_base);
+				return (radians < 0) ? -raw : raw;
 			}
-			else
+
+			static constexpr bam64 from_base(double value, double base) noexcept
 			{
-				return degrees_full();
+				// base must be positive
+				if (base <= 0)	{ return bam64{ .value = 0 }; }
+
+				bam64 raw = from_turns(cxcm::abs(value) / base);
+				return (value < 0) ? -raw : raw;
 			}
-		}
 
-		[[nodiscard]] constexpr double radians_full() const noexcept
-		{
-			return tau<double> * turns();
-		}
+			[[nodiscard]] constexpr double turns_full() const noexcept				{ return this->value * bam64::bam_to_unit_period; }
+			[[nodiscard]] constexpr double turns_comp() const noexcept				{ return -(~(*this)).turns_full(); }
+			[[nodiscard]] constexpr double turns_norm() const noexcept				{ return (this->value > bam64::half) ? turns_comp() : turns_full(); }
 
-		[[nodiscard]] constexpr double radians_comp() const noexcept
-		{
-			return -tau<double> * (~(*this)).turns();
-		}
+			[[nodiscard]] constexpr double base_full(double base) const noexcept	{ return base * turns_full(); }
+			[[nodiscard]] constexpr double base_comp(double base) const noexcept	{ return base * turns_comp(); }
+			[[nodiscard]] constexpr double base_norm(double base) const noexcept	{ return (this->value > bam64::half) ? base_comp(base) : base_full(base); }
 
-		[[nodiscard]] constexpr double radians_norm() const noexcept
-		{
-			if (this->value > turn::half)
-			{
-				return radians_comp();
-			}
-			else
-			{
-				return radians_full();
-			}
-		}
+			[[nodiscard]] constexpr double degrees_full() const noexcept			{ return base_full(bam64::degree_base); }
+			[[nodiscard]] constexpr double degrees_comp() const noexcept			{ return base_comp(bam64::degree_base); }
+			[[nodiscard]] constexpr double degrees_norm() const noexcept			{ return base_norm(bam64::degree_base); }
 
-		// relies on unsigned overflow
-		constexpr bam64 operator +(bam64 rhs) const noexcept
-		{
-			return { this->value + rhs.value };
-		}
+			[[nodiscard]] constexpr double radians_full() const noexcept			{ return base_full(bam64::radian_base); }
+			[[nodiscard]] constexpr double radians_comp() const noexcept			{ return base_comp(bam64::radian_base); }
+			[[nodiscard]] constexpr double radians_norm() const noexcept			{ return base_norm(bam64::radian_base); }
 
-		// relies on unsigned underflow
-		constexpr bam64 operator -(bam64 rhs) const noexcept
-		{
-			return { this->value - rhs.value };
-		}
+			// relies on unsigned overflow
+			constexpr bam64 operator +(bam64 rhs) const noexcept					{ return { this->value + rhs.value }; }
 
-		// unary plus is identity operation
-		constexpr bam64 operator +() const noexcept
-		{
-			return { this->value };
-		}
+			// relies on unsigned underflow
+			constexpr bam64 operator -(bam64 rhs) const noexcept					{ return { this->value - rhs.value }; }
 
-		// two's complement negation
-		// for a BAM, negation is its complement -> (1 - bam)
-		constexpr bam64 operator -() const noexcept
-		{
-			return { ~(this->value) + 1ULL };
-		}
+			// unary plus is identity operation
+			constexpr bam64 operator +() const noexcept								{ return { this->value }; }
 
-		// two's complement - same as negation
-		// for a BAM, negation is its complement -> (1 - normalized_periodic_value)
-		constexpr bam64 operator ~() const noexcept
-		{
-			return { ~(this->value) + 1ULL };
-		}
+			// two's complement negation
+			// for a BAM, negation is its complement -> (1 - bam)
+			constexpr bam64 operator -() const noexcept								{ return { ~(this->value) + 1ULL }; }
+
+			// two's complement - same as negation
+			// for a BAM, negation is its complement -> (1 - normalized_periodic_value)
+			constexpr bam64 operator ~() const noexcept								{ return { ~(this->value) + 1ULL }; }
 
 	};
 

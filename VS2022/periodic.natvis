@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 	<Type Name="pcs::bam64">
-		<DisplayString>bam = {value,X}</DisplayString>
+		<DisplayString>turns = { 5.4210108624275222e-20 * value }</DisplayString>
 		<Expand>
 			<Synthetic Name="degrees"><DisplayString>{ 1.9515639104739080e-17 * value }</DisplayString></Synthetic>
 			<Synthetic Name="radians"><DisplayString>{ 3.4061215800865545e-19 * value }</DisplayString></Synthetic>
-			<Synthetic Name="bam"><DisplayString>{value,X}</DisplayString></Synthetic>
+			<Synthetic Name="bam"><DisplayString>{value,x}</DisplayString></Synthetic>
 			<Synthetic Name="complements">
 				<DisplayString></DisplayString>
 				<Expand>
 					<Synthetic Name="degrees"><DisplayString>{ 360.0 - 1.9515639104739080e-17 * value }</DisplayString></Synthetic>
 					<Synthetic Name="radians"><DisplayString>{ 6.2831853071795862 - 3.4061215800865545e-19 * value }</DisplayString></Synthetic>
-					<Synthetic Name="bam"><DisplayString>{~value + 1ULL,X}</DisplayString></Synthetic>
+					<Synthetic Name="bam"><DisplayString>{~value + 1ULL,x}</DisplayString></Synthetic>
 				</Expand>
 			</Synthetic>
 		</Expand>
