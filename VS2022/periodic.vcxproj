@@ -166,7 +166,9 @@
   <ItemGroup>
     <ClInclude Include="..\dev_3rd\doctest.h" />
     <ClInclude Include="..\dev_3rd\nanobench.h" />
+    <ClInclude Include="..\include\bam64.hxx" />
     <ClInclude Include="..\include\periodic.hxx" />
+    <ClInclude Include="..\include\utility.hxx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />

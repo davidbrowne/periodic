@@ -6,8 +6,9 @@
 
 //#include "dev_3rd/nanobench.h"
 #include "periodic.hxx"
+#include "bam64.hxx"
+#include "utility.hxx"
 #include <cmath>
-
 
 //
 //
@@ -17,96 +18,17 @@
 //
 //
 
-
-template <std::floating_point T>
-constexpr inline T PI = std::numbers::pi_v<T>;
-
-template <std::floating_point T>
-constexpr inline T tau = T(T(2) * PI<T>);
-
-template <std::floating_point T>
-constexpr inline T TWOPI = tau<T>;
-
-// seems to be worse than full_ang()
-static double ang_full(double ang)
-{
-	static double i{};
-	double turns = std::modf(std::abs(ang) / tau<double>, &i);
-
-	if (ang < 0)
-	{
-		turns = (1.0 - turns);
-	}
-
-	return tau<double> *turns;
-}
-
-// seems to be worse than ang_in_minuspi_pluspi()
-static double ang_norm(double ang)
-{
-	static double i{};
-	double turns = std::modf(std::abs(ang) / tau<double>, &i);
-
-	if (ang < 0.0)
-	{
-		turns = (1.0 - turns);
-	}
-
-	if (turns > 0.5)
-	{
-		turns = (turns - 1.0);
-	}
-
-	return tau<double> *turns;
-}
-
-
-// Convert an angle in any system to the system [0, TWOPI).
-// Convert an angle to a value in the range (0 <= value < TWOPI).
-static double full_ang(double angle)
-{
-	while (angle < 0.0)
-		angle += TWOPI<double>;
-
-	while (angle >= TWOPI<double>)
-		angle -= TWOPI<double>;
-
-	return angle;
-}
-
-// Convert an angle in any system to the system (-PI, PI).
-// RETURNS: a double value in the range (-PI <= return value <= PI).
-// NOTE:	very similar to full_ang()
-static double ang_in_minuspi_pluspi(double ang)							// ang is any real number radian value
-{
-	while (ang < -PI<double>)
-		ang += TWOPI<double>;
-
-	while (ang > PI<double>)
-		ang -= TWOPI<double>;
-
-	return ang;
-}
-
 // this function is a place to just test out whatever
 static void sandbox_function()
 {
-
-
-
-
-
-
-
-
-
 	// put fun code here
-	pcs::bam64 some_turns{ pcs::bam64::fourth };
+
+	pcs::bam64 some_turns{ pcs::fourth };
 	[[maybe_unused]] auto complement = ~some_turns;
 
-	[[maybe_unused]] constexpr auto underlying = pcs::to_underlying(pcs::bam64::radian);
-//	[[maybe_unused]] constexpr auto something1 = 360.0 * pcs::to_underlying(pcs::bam64::radian) * pcs::bam64::bam_to_unit_period;
-	[[maybe_unused]] constexpr auto something2 = pcs::bam64::from_bam_value(pcs::bam64::radian).degrees_full();
+	[[maybe_unused]] constexpr auto underlying = pcs::to_underlying(pcs::radian);
+//	[[maybe_unused]] constexpr auto something1 = 360.0 * pcs::to_underlying(pcs::radian) * pcs::bam64::bam_to_unit_period;
+	[[maybe_unused]] constexpr auto something2 = pcs::bam64::from_bam_value(pcs::radian).degrees_full();
 
 	constexpr auto input_val = 190;
 	constexpr auto output_period = 360.0;
@@ -133,28 +55,86 @@ static void sandbox_function()
 	[[maybe_unused]] auto t = math_degrees_to_bearing_degrees(135.0);
 	[[maybe_unused]] auto rt = math_degrees_to_bearing_degrees.reverse(135.0);
 
-	[[maybe_unused]] auto degzero = pcs::bam64(pcs::bam64::none).degrees_full();
-	[[maybe_unused]] auto degsixtyfourth = pcs::bam64(pcs::bam64::sixty_fourth).degrees_full();
-	[[maybe_unused]] auto deg32nd = pcs::bam64(pcs::bam64::thirty_second).degrees_full();
-	[[maybe_unused]] auto deg16th = pcs::bam64(pcs::bam64::sixteenth).degrees_full();
-	[[maybe_unused]] auto deg8th = pcs::bam64(pcs::bam64::eighth).degrees_full();
-	[[maybe_unused]] auto deg4th = pcs::bam64(pcs::bam64::fourth).degrees_full();
-	[[maybe_unused]] auto deghalf = pcs::bam64(pcs::bam64::half);
+	[[maybe_unused]] auto degzero = pcs::bam64(pcs::none).degrees_full();
+	[[maybe_unused]] auto degsixtyfourth = pcs::bam64(pcs::sixty_fourth).degrees_full();
+	[[maybe_unused]] auto deg32nd = pcs::bam64(pcs::thirty_second).degrees_full();
+	[[maybe_unused]] auto deg16th = pcs::bam64(pcs::sixteenth).degrees_full();
+	[[maybe_unused]] auto deg8th = pcs::bam64(pcs::eighth).degrees_full();
+	[[maybe_unused]] auto deg4th = pcs::bam64(pcs::fourth).degrees_full();
+	[[maybe_unused]] auto deghalf = pcs::bam64(pcs::half);
 	[[maybe_unused]] auto deghalf1 = deghalf.degrees_full();
 	[[maybe_unused]] auto deghalf2 = deghalf.degrees_norm();
-	[[maybe_unused]] auto deg3quarters = pcs::bam64(pcs::bam64::three_fourths).degrees_full();
-	[[maybe_unused]] auto deg12th = pcs::bam64(pcs::bam64::twelfth).degrees_full();
-	[[maybe_unused]] auto deg6th = pcs::bam64(pcs::bam64::sixth).degrees_full();
-	[[maybe_unused]] auto degthird = pcs::bam64(pcs::bam64::third).degrees_full();
-	[[maybe_unused]] auto deg5th = pcs::bam64(pcs::bam64::fifth).degrees_full();
+	[[maybe_unused]] auto deg3quarters = pcs::bam64(pcs::three_fourths).degrees_full();
+	[[maybe_unused]] auto deg12th = pcs::bam64(pcs::twelfth).degrees_full();
+	[[maybe_unused]] auto deg6th = pcs::bam64(pcs::sixth).degrees_full();
+	[[maybe_unused]] auto degthird = pcs::bam64(pcs::third).degrees_full();
+	[[maybe_unused]] auto deg5th = pcs::bam64(pcs::fifth).degrees_full();
 
 	auto deg3quarters_bam = pcs::bam64::from_degrees(270.0);
 	[[maybe_unused]] auto bamtest = (~deg3quarters_bam).degrees_full();
 	auto degquarter = pcs::bam64::from_degrees(90.0);
 	[[maybe_unused]] auto bamtest1 = (~degquarter).degrees_full();
 	auto degnegquarter = pcs::bam64::from_degrees(-90.0);
+
+	[[maybe_unused]] auto full_dnq = degnegquarter.turns_full();
+	[[maybe_unused]] auto comp_dnq = degnegquarter.turns_comp();
+	[[maybe_unused]] auto norm_dnq = degnegquarter.turns_norm();
+	[[maybe_unused]] auto neg_dnq = -degnegquarter;
+	[[maybe_unused]] auto comp_op_dnq = ~degnegquarter;
+
+	[[maybe_unused]] auto full_dnq_b = degnegquarter.base_full(1);
+	[[maybe_unused]] auto comp_dnq_b = degnegquarter.base_comp(1);
+	[[maybe_unused]] auto norm_dnq_b = degnegquarter.base_norm(1);
+
+	[[maybe_unused]] auto full_dq = degquarter.turns_full();
+	[[maybe_unused]] auto comp_dq = degquarter.turns_comp();
+	[[maybe_unused]] auto norm_dq = degquarter.turns_norm();
+	[[maybe_unused]] auto neg_dq = -degquarter;
+	[[maybe_unused]] auto comp_op_dq = ~degquarter;
+
+	[[maybe_unused]] auto some120 = pcs::bam64::from_degrees(120.0);
+	[[maybe_unused]] auto full_s120 = some120.turns_full();
+	[[maybe_unused]] auto comp_s120 = some120.turns_comp();
+	[[maybe_unused]] auto norm_s120 = some120.turns_norm();
+	[[maybe_unused]] auto neg_s120 = -some120;
+	[[maybe_unused]] auto comp_op_s120 = ~some120;
+
+	constexpr auto bam1 = pcs::bam64::from_turns(0.1);
+	constexpr auto bam2 = pcs::bam64::from_turns(0.11);
+	constexpr auto bam3 = pcs::bam64::from_turns(0.9);
+	constexpr auto bam4 = pcs::bam64::from_turns(0.89);
+
+//	[[maybe_unused]] auto bool1 = bam1.within_tolerance(bam1);
+//	[[maybe_unused]] auto bool2 = bam1.within_tolerance(bam2);
+//	[[maybe_unused]] auto bool2a = bam1.within_tolerance(bam3);
+
+//	[[maybe_unused]] auto bool3 = bam2.within_tolerance(bam1);
+//	[[maybe_unused]] auto bool3a = bam3.within_tolerance(bam2);
+	[[maybe_unused]] constexpr auto bool3b = bam3.within_tolerance(bam1);
+	[[maybe_unused]] constexpr auto bool3c = bam4.within_tolerance(bam2);
+	[[maybe_unused]] constexpr auto bool3d = bam4.within_tolerance(bam1);
+
+//	[[maybe_unused]] auto bool4 = bam2.within_tolerance(bam2);
+//	[[maybe_unused]] auto bool5 = bam3.within_tolerance(bam1);
+//	[[maybe_unused]] auto bool6 = bam3.within_tolerance(bam2);
+//	[[maybe_unused]] auto bool7 = bam3.within_tolerance(bam3);
+
+
 	[[maybe_unused]] auto bamtest2 = degnegquarter.degrees_full();
-	auto degbigneg = pcs::bam64::from_degrees(-700.0);
+	[[maybe_unused]] auto degbigneg = pcs::bam64::from_degrees(-700.0);
+	[[maybe_unused]] auto deg_20 = pcs::bam64::from_degrees(20.0);
+	[[maybe_unused]] auto diff20 = degbigneg - deg_20;
+	[[maybe_unused]] auto diff20_2 =  deg_20 - degbigneg;
+
+	[[maybe_unused]] auto bam_p5 = pcs::bam64::from_turns(0.5);
+	[[maybe_unused]] auto full_p5 = bam_p5.turns_full();
+	[[maybe_unused]] auto comp_p5 = bam_p5.turns_comp();
+	[[maybe_unused]] auto norm_p5 = bam_p5.turns_norm();
+
+	[[maybe_unused]] auto bam_np5 = pcs::bam64::from_turns(-0.5);
+	[[maybe_unused]] auto full_np5 = bam_np5.turns_full();
+	[[maybe_unused]] auto comp_np5 = bam_np5.turns_comp();
+	[[maybe_unused]] auto norm_np5 = bam_np5.turns_norm();
 
 	[[maybe_unused]] auto bamtest3 = degnegquarter.degrees_comp();
 	[[maybe_unused]] auto bamtest4 = degnegquarter.radians_comp();
@@ -174,10 +154,10 @@ static void sandbox_function()
 	[[maybe_unused]] auto factor1 = 360.0 * 0x1p-64;
 	[[maybe_unused]] auto factor2 = 6.2831853071795862 * 0x1p-64;
 
-	[[maybe_unused]] auto oneradian = pcs::bam64{pcs::bam64::radian};
-	[[maybe_unused]] auto fifthturn = pcs::bam64{pcs::bam64::fifth};
-	[[maybe_unused]] auto fifteenthturn = pcs::bam64{pcs::bam64::fifteenth};
-	[[maybe_unused]] auto thirdturn = pcs::bam64{pcs::bam64::third};
+	[[maybe_unused]] auto oneradian = pcs::bam64{pcs::radian};
+	[[maybe_unused]] auto fifthturn = pcs::bam64{pcs::fifth};
+	[[maybe_unused]] auto fifteenthturn = pcs::bam64{pcs::fifteenth};
+	[[maybe_unused]] auto thirdturn = pcs::bam64{pcs::third};
 	[[maybe_unused]] auto thirtydegrees = pcs::bam64::from_degrees(30);
 	[[maybe_unused]] auto sixtydegrees = pcs::bam64::from_degrees(60);
 	[[maybe_unused]] auto thirdturndeg = pcs::bam64::from_degrees(120);
@@ -194,10 +174,9 @@ static void sandbox_function()
 	[[maybe_unused]] auto seventysecondturndeg = pcs::bam64::from_degrees(5);
 	[[maybe_unused]] auto radian_again = pcs::bam64::from_degrees(57.295779513082321);
 	[[maybe_unused]] auto radian_again1 = pcs::bam64::from_radians(1.0);
-	[[maybe_unused]] auto radian_again2 = pcs::bam64::from_degrees(180.0 / PI<double>);
-	[[maybe_unused]] auto radian_again3 = pcs::bam64{static_cast<unsigned long long>(0x1p63 / PI<double>)};
-	[[maybe_unused]] auto radian_again4 = pcs::bam64{0x28B0000000000009};
-	[[maybe_unused]] auto radian_again5 = pcs::bam64{0x0477d1a894a74e40};
+	[[maybe_unused]] auto radian_again2 = pcs::bam64::from_degrees(180.0 / pcs::pi);
+	[[maybe_unused]] auto radian_again3 = pcs::bam64::from_bam_value(static_cast<unsigned long long>(0x1p63 / pcs::pi));
+	[[maybe_unused]] auto almost_radian_again4 = pcs::bam64::from_bam_value(0x28B0000000000009);		// don't remember how I got this
 
 	[[maybe_unused]] auto deg1 =	pcs::bam64::from_degrees(1);		// 0x00b60b60b60b60b8		threehundredsixtieth
 	[[maybe_unused]] auto deg1_5 =	pcs::bam64::from_degrees(1.5);		// 0x0111111111111110		twohundredfortieth
@@ -245,7 +224,7 @@ static void sandbox_function()
 	[[maybe_unused]] auto rad =		pcs::bam64::from_radians(1);		// 0x28be60db93910600		radian
 	[[maybe_unused]] auto deg =		pcs::bam64::from_degrees(1);		// 0x00b60b60b60b60b8		degree
 
-	[[maybe_unused]] auto dd = pcs::bam64::from_radians(PI<double> / 180.0);		// 0x28be60db93910600		radian
+	[[maybe_unused]] auto dd = pcs::bam64::from_radians(pcs::pi / 180.0);		// 0x28be60db93910600		radian
 
 
 	[[maybe_unused]] constexpr auto comp0 = (pcs::bam64::from_degrees(315) + pcs::bam64::from_degrees(22.5));
@@ -269,40 +248,86 @@ static void sandbox_function()
 	[[maybe_unused]] auto foobar1 = pcs::bam64::from_degrees(-90);
 	[[maybe_unused]] auto foobar2 = pcs::bam64::from_degrees(90);
 
+	[[maybe_unused]] auto foobar3 = pcs::bam64::from_bam_value(pcs::nine_sixteenths);
+
+	[[maybe_unused]] auto arcminute = pcs::bam64::from_bam_value(pcs::to_underlying(pcs::degree)) / 60.0;
+	[[maybe_unused]] auto arcsecond = pcs::bam64::from_bam_value(pcs::to_underlying(pcs::degree)) / 3600.0;
+
+	auto sixty_arcminutes = 0x000308b91419ca25ULL * 60ULL;
+	[[maybe_unused]] auto test_arcminute = pcs::bam64{ sixty_arcminutes }.degrees_full();
+	auto three_thousand_six_hundred_arcseconds = 0x00000cf2049a07a2 * 3600ULL;
+	[[maybe_unused]] auto test_arcsecond = pcs::bam64{ three_thousand_six_hundred_arcseconds }.degrees_full();
+
+	[[maybe_unused]] auto two_fifths = pcs::bam64::from_degrees(144);
+	[[maybe_unused]] auto two_fifths2 = pcs::bam64::from_bam_value(pcs::two_fifths);
+	[[maybe_unused]] auto three_fifths = pcs::bam64::from_degrees(216);
+	[[maybe_unused]] auto three_fifths2 = pcs::bam64::from_bam_value(pcs::three_fifths);
+	[[maybe_unused]] auto four_fifths = pcs::bam64::from_degrees(288);
+	[[maybe_unused]] auto four_fifths2 = pcs::bam64::from_bam_value(pcs::four_fifths);
+	[[maybe_unused]] auto sixtieth_of_degree = pcs::bam64::from_degrees(1) / 60;
+	[[maybe_unused]] auto thirty_minutes = pcs::bam64::from_time(30);
+	[[maybe_unused]] auto forty_five_seconds = pcs::bam64::from_time(45);
+
+	[[maybe_unused]] auto oneeighty = pcs::bam64::from_degrees(180);
+	[[maybe_unused]] auto oneeightycomp = oneeighty.degrees_comp();
+
 	constexpr int ninety_factor = 17;
-	auto ninetydegrees = pcs::tau<double> / 4.0;
-	auto mult_ninety = ninetydegrees + ninety_factor * pcs::tau<double>;
+	auto ninetydegrees = pcs::tau / 4.0;
+	[[maybe_unused]] auto negninetydegrees1 = pcs::full_ang(- pcs::tau / 4.0);
+	[[maybe_unused]] auto negninetydegrees2 = pcs::ang_full(- pcs::tau / 4.0);
+	auto mult_ninety = ninetydegrees + ninety_factor * pcs::tau;
 	auto add_ninety = ninetydegrees;
 	for (int i = 0; i < ninety_factor; ++i)
 	{
-		add_ninety += pcs::tau<double>;
+		add_ninety += pcs::tau;
 	}
 	[[maybe_unused]] auto test_ninety1 = (mult_ninety == add_ninety);
 
-	[[maybe_unused]] auto fang1 = full_ang(mult_ninety);
-	[[maybe_unused]] auto fang2 = full_ang(add_ninety);
-	[[maybe_unused]] auto fang3 = ang_full(mult_ninety);
-	[[maybe_unused]] auto fang4 = ang_full(add_ninety);
+	[[maybe_unused]] auto fang1 = pcs::full_ang(mult_ninety);
+	[[maybe_unused]] auto fang2 = pcs::full_ang(add_ninety);
+	[[maybe_unused]] auto fang3 = pcs::ang_full(mult_ninety);
+	[[maybe_unused]] auto fang4 = pcs::ang_full(add_ninety);
+
+	[[maybe_unused]] auto diff1 = ninetydegrees - fang1;
+	[[maybe_unused]] auto diff2 = ninetydegrees - fang2;
+	[[maybe_unused]] auto diff3 = ninetydegrees - fang3;
+	[[maybe_unused]] auto diff4 = ninetydegrees - fang4;
 
 
-	[[maybe_unused]] auto threequarters = pcs::bam64(pcs::bam64::three_fourths).radians_full();
+	[[maybe_unused]] auto threequarters = pcs::bam64(pcs::three_fourths).radians_full();
+	[[maybe_unused]] auto some_tol1 = pcs::bam64::from_radians(1e-10);
+	[[maybe_unused]] auto some_tol2 = pcs::bam64::from_bam_value(0x0000000010000000);
+	[[maybe_unused]] auto some_tol_diff = some_tol2 - some_tol1;
 
-	[[maybe_unused]] auto mang1 = ang_in_minuspi_pluspi(mult_ninety);
-	[[maybe_unused]] auto mang2 = ang_in_minuspi_pluspi(add_ninety);
-	[[maybe_unused]] auto mang3 = ang_norm(mult_ninety);
-	[[maybe_unused]] auto mang4 = ang_norm(add_ninety);
+	[[maybe_unused]] auto mang1 = pcs::bam64::from_radians(pcs::norm_ang(mult_ninety));
+	[[maybe_unused]] auto mang2 = pcs::bam64::from_radians(pcs::norm_ang(add_ninety));
+	[[maybe_unused]] auto mang3 = pcs::bam64::from_radians(pcs::ang_norm(mult_ninety));
+	[[maybe_unused]] auto mang4 = pcs::bam64::from_radians(pcs::ang_norm(add_ninety));
 
-	[[maybe_unused]] auto sfang1 = full_ang(pcs::tau<double> + pcs::tau<double> - ninetydegrees);
-	[[maybe_unused]] auto sfang2 = full_ang(ninetydegrees - pcs::tau<double> - pcs::tau<double>);
-	[[maybe_unused]] auto sfang3 = ang_full(pcs::tau<double> + pcs::tau<double> - ninetydegrees);
-	[[maybe_unused]] auto sfang4 = ang_full(ninetydegrees - pcs::tau<double> - pcs::tau<double>);
+	[[maybe_unused]] auto mang1_diff = mang1 - foobar2;
+	[[maybe_unused]] auto mang2_diff = mang2 - foobar2;
+	[[maybe_unused]] auto mang3_diff = mang3 - foobar2;
+	[[maybe_unused]] auto mang4_diff = mang4 - foobar2;
 
-	[[maybe_unused]] auto smang1 = ang_in_minuspi_pluspi(pcs::tau<double> + pcs::tau<double> - ninetydegrees);
-	[[maybe_unused]] auto smang2 = ang_in_minuspi_pluspi(ninetydegrees - pcs::tau<double> - pcs::tau<double>);
-	[[maybe_unused]] auto smang3 = ang_norm(pcs::tau<double> + pcs::tau<double> - ninetydegrees);
-	[[maybe_unused]] auto smang4 = ang_norm(ninetydegrees - pcs::tau<double> - pcs::tau<double>);
+	[[maybe_unused]] auto sfang1 = pcs::bam64::from_radians(pcs::full_ang(pcs::tau + pcs::tau - ninetydegrees));
+	[[maybe_unused]] auto sfang2 = pcs::bam64::from_radians(pcs::full_ang(ninetydegrees - pcs::tau - pcs::tau));
+	[[maybe_unused]] auto sfang3 = pcs::bam64::from_radians(pcs::ang_full(pcs::tau + pcs::tau - ninetydegrees));
+	[[maybe_unused]] auto sfang4 = pcs::bam64::from_radians(pcs::ang_full(ninetydegrees - pcs::tau - pcs::tau));
 
+	[[maybe_unused]] auto sfang1_diff = sfang1 - foobar1;
+	[[maybe_unused]] auto sfang2_diff = sfang2 - foobar2;
+	[[maybe_unused]] auto sfang3_diff = sfang3 - foobar1;
+	[[maybe_unused]] auto sfang4_diff = sfang4 - foobar2;
 
+	[[maybe_unused]] auto smang1 = pcs::bam64::from_radians(pcs::norm_ang(pcs::tau + pcs::tau - ninetydegrees));
+	[[maybe_unused]] auto smang2 = pcs::bam64::from_radians(pcs::norm_ang(ninetydegrees - pcs::tau - pcs::tau));
+	[[maybe_unused]] auto smang3 = pcs::bam64::from_radians(pcs::ang_norm(pcs::tau + pcs::tau - ninetydegrees));
+	[[maybe_unused]] auto smang4 = pcs::bam64::from_radians(pcs::ang_norm(ninetydegrees - pcs::tau - pcs::tau));
+
+	[[maybe_unused]] auto smang1_diff = smang1 - foobar1;
+	[[maybe_unused]] auto smang2_diff = smang2 - foobar2;
+	[[maybe_unused]] auto smang3_diff = smang3 - foobar1;
+	[[maybe_unused]] auto smang4_diff = smang4 - foobar2;
 
 	auto ninetytest1 = pcs::bam64::from_radians(mult_ninety).radians_full();
 	auto ninetytest2 = pcs::bam64::from_radians(mult_ninety).radians_norm();
