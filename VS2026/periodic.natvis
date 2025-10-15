@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="pcs::bam64">
+		<DisplayString>{{ full turns = { 5.4210108624275222e-20 * value } }}</DisplayString>
+		<Expand>
+			<Synthetic Name="full turns"><DisplayString>{ 5.4210108624275222e-20 * value }</DisplayString></Synthetic>
+			<Synthetic Name="normalized turns" Condition="value &gt; 0x8000000000000000"><DisplayString>-{ 1 - (5.4210108624275222e-20 * value) }</DisplayString></Synthetic>
+			<Synthetic Name="normalized turns" Condition="value &lt;= 0x8000000000000000"><DisplayString>{ 5.4210108624275222e-20 * value }</DisplayString></Synthetic>
+			<Synthetic Name="degrees"><DisplayString>{ 1.9515639104739080e-17 * value }</DisplayString></Synthetic>
+			<Synthetic Name="radians"><DisplayString>{ 3.4061215800865545e-19 * value }</DisplayString></Synthetic>
+			<Synthetic Name="bam"><DisplayString>{ value,x }</DisplayString></Synthetic>
+			<Synthetic Name="dist_to_0" Condition="value &lt;= 0x8000000000000000"><DisplayString>{ value,x }</DisplayString></Synthetic>
+			<Synthetic Name="dist_to_0" Condition="value &gt; 0x8000000000000000"><DisplayString>{ ~value + 1ULL,x }</DisplayString></Synthetic>
+			<Synthetic Name="negated">
+				<DisplayString></DisplayString>
+				<Expand>
+					<Synthetic Name="full turns"><DisplayString>{ 5.4210108624275222e-20 * (~value + 1ULL) }</DisplayString></Synthetic>
+					<Synthetic Name="normalized turns" Condition="(~value + 1ULL) &gt; 0x8000000000000000"><DisplayString>-{ 1 - (5.4210108624275222e-20 * (~value + 1ULL)) }</DisplayString></Synthetic>
+					<Synthetic Name="normalized turns" Condition="(~value + 1ULL) &lt;= 0x8000000000000000"><DisplayString>{ 5.4210108624275222e-20 * (~value + 1ULL) }</DisplayString></Synthetic>
+					<Synthetic Name="degrees"><DisplayString>{ 360.0 - 1.9515639104739080e-17 * value }</DisplayString></Synthetic>
+					<Synthetic Name="radians"><DisplayString>{ 6.2831853071795862 - 3.4061215800865545e-19 * value }</DisplayString></Synthetic>
+					<Synthetic Name="bam"><DisplayString>{ ~value + 1ULL,x }</DisplayString></Synthetic>
+				</Expand>
+			</Synthetic>
+		</Expand>
+	</Type>
+</AutoVisualizer>
