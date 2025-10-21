@@ -11,13 +11,25 @@
 namespace pcs
 {
 	// radian related constants
-	inline constexpr static double pi =	3.1415926535897931;
-	inline constexpr static double twopi =	6.2831853071795862;
-	inline constexpr static double tau =	6.2831853071795862;
+	inline static constexpr double half_pi =		1.5707963267948966;
+	inline static constexpr double pi =				3.1415926535897931;			// 3.141592653589793238462643383279502884L
+	inline static constexpr double two_pi =			6.2831853071795862;			// 6.283185307179586476925286766559005768L
+	inline static constexpr double tau =			6.2831853071795862;
+
+	// degree related constants
+	inline static constexpr double half_degrees = 180.0;
+	inline static constexpr double full_degrees = 360.0;
 
 	// detail namespace for helper functions
 	namespace detail
 	{
+		// constants for converting to/from degrees, radians, turns, time units, etc.
+		inline static constexpr double turn_base =		1.0;					//   1 turn		-> 1 period
+		inline static constexpr double minute_base =   60.0;					//  60 minutes	-> 1 hour
+		inline static constexpr double second_base =   60.0;					//  60 seconds	-> 1 minute
+		inline static constexpr double degree_base =  360.0;					// 360 degrees	-> 1 circle
+		inline static constexpr double radian_base =	6.2831853071795862;		// 2pi radians	-> 1 circle
+
 		// truncate towards zero
 		inline constexpr double trunc(double value) noexcept			{ return static_cast<double>(static_cast<long long>(value)); }
 
@@ -31,56 +43,56 @@ namespace pcs
 
 	// convert an angle to a representation that is in the range [0, 2pi)
 	// good for wrapping angles that may be large, with many extra turns
-	inline constexpr double ang_full(double ang)
+	inline constexpr double radians_full(double radians)
 	{
-		double turns = detail::fmod(detail::abs(ang), pcs::twopi);
+		double fraction = detail::fmod(detail::abs(radians), pcs::detail::radian_base);
 
 		// compensate for negative angle
-		if (ang < 0)				{ turns = (1.0 - turns); }
+		if (radians < 0)				{ fraction = (1.0 - fraction); }
 
-		return pcs::twopi * turns;
+		return pcs::detail::radian_base * fraction;
 	}
 
 	// convert an angle to a normalized representation that is in the range (-pi, pi]
 	// good for wrapping angles that may be large, with many extra turns
-	inline constexpr double ang_norm(double ang)
+	inline constexpr double radians_normal(double radians)
 	{
-		double turns = detail::fmod(detail::abs(ang), pcs::twopi);
+		double fraction = detail::fmod(detail::abs(radians), pcs::detail::radian_base);
 
 		// compensate for negative angle
-		if (ang < 0.0)				{ turns = (1.0 - turns); }
+		if (radians < 0.0)				{ fraction = (1.0 - fraction); }
 
 		// compensate if in latter half of period
-		if (turns > 0.5)			{ turns = (turns - 1.0); }
+		if (fraction > 0.5)				{ fraction = (fraction - 1.0); }
 
-		return pcs::twopi * turns;
+		return pcs::detail::radian_base * fraction;
 	}
 
 
 	// convert an angle to a representation that is in the range [0, 2pi)
 	// good for wrapping angles that are only a little out of range (angles that might have an extra turn, +/-)
-	inline constexpr double full_ang(double ang)
+	inline constexpr double full_radians(double radians)
 	{
 		// adjust from the negative side
-		while (ang < 0.0)			{ ang += pcs::twopi; }
+		while (radians < 0.0)			{ radians += pcs::two_pi; }
 
 		// adjust from the positive side
-		while (ang >= pcs::twopi)	{ ang -= pcs::twopi; }
+		while (radians >= pcs::two_pi)	{ radians -= pcs::two_pi; }
 
-		return ang;
+		return radians;
 	}
 
 	// convert an angle to a normalized representation that is in the range (-pi, pi)
 	// good for wrapping angles that are only a little out of range (angles that might have an extra turn, +/-)
-	inline constexpr double norm_ang(double ang)
+	inline constexpr double normal_radians(double radians)
 	{
 		// adjust from the negative side
-		while (ang < -pcs::pi)		{ ang += pcs::twopi; }
+		while (radians < -pcs::pi)		{ radians += pcs::two_pi; }
 
 		// adjust from the positive side
-		while (ang > pcs::pi)		{ ang -= pcs::twopi; }
+		while (radians > pcs::pi)		{ radians -= pcs::two_pi; }
 
-		return ang;
+		return radians;
 	}
 
 	// 64-bit binary angular measurement (bam).
@@ -101,27 +113,22 @@ namespace pcs
 	struct bam64
 	{
 		private:
+
 			// format converters used for going to or from bam format
 			static constexpr double unit_period_to_bam = 0x1p64;			// a multiplier constant to create a bam value from a fractional value in [0.0, 1.0)
 			static constexpr double bam_to_unit_period = 0x1p-64;			// a multiplier constant to create a [0.0, 1.0) value from a bam value
-
-			// constants for converting to/from degrees, radians, turns, time units, etc.
-			static constexpr double turn_base =		  1.0;					//   1 turn					-> 1 period
-			static constexpr double time_base =		 60.0;					//  60 minutes or seconds	-> 1 hour or 1 minute
-			static constexpr double degree_base =	360.0;					// 360 degrees				-> 1 circle
-			static constexpr double radian_base =	pcs::twopi;				// 2pi radians				-> 1 circle
 
 			// half period bam value constant
 			static constexpr unsigned long long half =	0x8000000000000000;
 
 			// truncate towards zero
-			static constexpr double trunc(double value) noexcept		{ return static_cast<double>(static_cast<long long>(value)); }
+			[[nodiscard]] static constexpr double trunc(double value) noexcept		{ return static_cast<double>(static_cast<long long>(value)); }
 
 			// the floating point remainder of division
-			static constexpr double fmod(double x, double y) noexcept	{ return x / y - bam64::trunc(x / y); }
+			[[nodiscard]] static constexpr double fmod(double x, double y) noexcept	{ return x / y - bam64::trunc(x / y); }
 
 			// workhorse function for creating a bam from a fractional part of a full period
-			static constexpr bam64 fractional_base(double value, double base) noexcept
+			[[nodiscard]] static constexpr bam64 fractional_base(double value, double base) noexcept
 			{
 				double fraction = bam64::fmod(value, base);
 				if (fraction < 0)	{ fraction += 1.0; }	// don't allow negative values if you are casting to an unsigned type
@@ -129,113 +136,154 @@ namespace pcs
 			}
 
 		public:
+
 			// the bam value
 			unsigned long long value;
 
+
+			// builders
+
+			// can use one of the enum values defined after the struct definition to create a bam64 from a known constant
+			[[nodiscard]] static constexpr bam64 from_bam_value(unsigned long long bam_value) noexcept		{ return { .value = bam_value }; }
+
 			// whether you are trying make a bam from a turn, a minute, an hour, a degree, or radian value, all the whole amounts of
 			// whichever representation you are using, it will use the fraction of the value for making the bam value.
+			[[nodiscard]] static constexpr bam64 from_base(double value, double base) noexcept
+			{
+				if (base == 0.0)	{ return { .value = 0 }; }
+				return bam64::fractional_base(value, base);
+			}
 
-			static constexpr bam64 from_bam_value(unsigned long long bam_value) noexcept	{ return { .value = bam_value }; }
-			static constexpr bam64 from_turns(double turns) noexcept						{ return bam64::fractional_base(turns,		bam64::turn_base); }
-			static constexpr bam64 from_time(double time_units) noexcept					{ return bam64::fractional_base(time_units,	bam64::time_base); }
-			static constexpr bam64 from_degrees(double degrees) noexcept					{ return bam64::fractional_base(degrees,	bam64::degree_base); }
-			static constexpr bam64 from_radians(double radians) noexcept					{ return bam64::fractional_base(radians,	bam64::radian_base); }
-			static constexpr bam64 from_base(double value, double base) noexcept			{ if (base == 0.0)	{ return { .value = 0 }; }
-																							  return bam64::fractional_base(value, base); }
 
-			// full - period value in range [0, 1) * base
-			// comp - complementary period value in range [0, 1) * base
-			// norm - normalized period value in range (-0.5, 0.5] * base
+			// periodic properties
 
-			[[nodiscard]] constexpr double turns_full() const noexcept				{ return this->value * bam64::bam_to_unit_period; }
-			[[nodiscard]] constexpr double turns_comp() const noexcept				{ return (-(*this)).turns_full(); }
-			[[nodiscard]] constexpr double turns_norm() const noexcept				{ return (this->value > bam64::half) ? -this->turns_comp() : this->turns_full(); }
+			// fraction - period value in range [0, 1) * base
+			[[nodiscard]] constexpr double fraction(double base = 1.0) const noexcept		{ return base * this->value * bam64::bam_to_unit_period; }
 
-			[[nodiscard]] constexpr double base_full(double base) const noexcept	{ return base * this->turns_full(); }
-			[[nodiscard]] constexpr double base_comp(double base) const noexcept	{ return base * this->turns_comp(); }
-			[[nodiscard]] constexpr double base_norm(double base) const noexcept	{ return (this->value > bam64::half) ? -this->base_comp(base) : this->base_full(base); }
+			// complement - complementary period value in range [0, 1) * base
+			[[nodiscard]] constexpr double complement(double base = 1.0) const noexcept		{ return base * (~(*this)).fraction(); }
 
-			[[nodiscard]] constexpr double time_full() const noexcept				{ return this->base_full(bam64::time_base); }
-			[[nodiscard]] constexpr double time_comp() const noexcept				{ return this->base_comp(bam64::time_base); }
-			[[nodiscard]] constexpr double time_norm() const noexcept				{ return this->base_norm(bam64::time_base); }
+			// opposite - period value half a period away, in range [0, 1) * base
+			[[nodiscard]] constexpr double opposite(double base = 1.0) const noexcept		{ return base * (-(*this)).fraction(); }
 
-			[[nodiscard]] constexpr double degrees_full() const noexcept			{ return this->base_full(bam64::degree_base); }
-			[[nodiscard]] constexpr double degrees_comp() const noexcept			{ return this->base_comp(bam64::degree_base); }
-			[[nodiscard]] constexpr double degrees_norm() const noexcept			{ return this->base_norm(bam64::degree_base); }
+			// normal - normalized period value in range (-0.5, 0.5] * base
+			[[nodiscard]] constexpr double normal(double base = 1.0) const noexcept
+			{
+				return base * ((this->value > bam64::half) ? -(this->complement()) : this->fraction());
+			}
 
-			[[nodiscard]] constexpr double radians_full() const noexcept			{ return this->base_full(bam64::radian_base); }
-			[[nodiscard]] constexpr double radians_comp() const noexcept			{ return this->base_comp(bam64::radian_base); }
-			[[nodiscard]] constexpr double radians_norm() const noexcept			{ return this->base_norm(bam64::radian_base); }
 
-			// relies on unsigned overflow
-			[[nodiscard]] constexpr bam64 operator +(bam64 rhs) const noexcept		{ return { .value = this->value + rhs.value }; }
-
-			// relies on unsigned underflow
-			[[nodiscard]] friend constexpr bam64 operator -(bam64 lhs, bam64 rhs) noexcept		{ return { .value = lhs.value - rhs.value }; }
+			// unary operators
 
 			// unary plus is identity operation
 			[[nodiscard]] constexpr bam64 operator +() const noexcept				{ return { .value = this->value }; }
 
 			// two's complement negation
 			// for a BAM, negation is its complement
-			[[nodiscard]] constexpr bam64 operator -() const noexcept				{ return { .value = ~(this->value) + 1ULL }; }
+			[[nodiscard]] constexpr bam64 operator ~() const noexcept				{ return { .value = ~(this->value) + 1ULL }; }
 
 			// the position half a period away
-			[[nodiscard]] constexpr bam64 operator ~() const noexcept				{ return { .value = this->value + bam64::half }; }
+			[[nodiscard]] constexpr bam64 operator -() const noexcept				{ return { .value = this->value + bam64::half }; }
 
-			[[nodiscard]] constexpr bam64 operator *(double mult) const noexcept	{ return bam64::from_turns(this->turns_full() * mult); }
 
-			[[nodiscard]] friend constexpr bam64 operator *(double mult, const bam64 &bam) noexcept
+			// binary operators
+
+			// relies on unsigned overflow
+			[[nodiscard]] constexpr bam64 operator +(bam64 rhs) const noexcept				{ return { .value = this->value + rhs.value }; }
+
+			// relies on unsigned underflow
+			[[nodiscard]] constexpr bam64 operator -(bam64 rhs) noexcept					{ return { .value = this->value - rhs.value }; }
+
+			[[nodiscard]] constexpr bam64 operator *(double multiplier) const noexcept		{ return bam64::from_base(this->fraction() * multiplier, 1.0); }
+
+			[[nodiscard]] constexpr bam64 operator /(double divisor) const noexcept
 			{
-				return bam64::from_turns(bam.turns_full() * mult);
+				if (divisor == 0.0)	{ return { .value = 0 }; }
+				return bam64::from_base(this->fraction() / divisor, 1.0);
 			}
 
-			[[nodiscard]] constexpr bam64 operator /(double turns) const noexcept
-			{
-				if (turns == 0.0)	{ return { .value = 0 }; }
-				return bam64::from_turns(this->turns_full() / turns);
-			}
 
-			[[nodiscard]] constexpr bam64 operator /(const bam64 &bam) noexcept
-			{
-				if (bam.value == 0.0)	{ return { .value = 0 }; }
-				return bam64::from_turns(this->turns_full() / bam.turns_full());
-			}
+			// comparison functions
 
-			[[nodiscard]] constexpr std::strong_ordering operator <=>(const bam64 &other) const noexcept
-			{
-				return this->value <=> other.value;
-			}
+			[[nodiscard]] constexpr std::strong_ordering operator <=>(const bam64 &other) const noexcept	{ return this->value <=> other.value; }
 
-			[[nodiscard]] constexpr bool operator ==(const bam64 &other) const noexcept
-			{
-				return this->value == other.value;
-			}
+			[[nodiscard]] constexpr bool operator ==(const bam64 &other) const noexcept						{ return this->value == other.value; }
 
 			// is the value within the tolerance range of zero?
 			[[nodiscard]] constexpr bool within_tolerance(bam64 tolerance) const noexcept
 			{
-				bam64 neg_val = -(*this);								// we approach zero from both the low and high sides, so we need the negative value too
+				bam64 neg_val = ~(*this);								// we approach zero from both the low and high sides, so we need the complement value too
 				bam64 min_val = ((*this) > neg_val) ? neg_val : *this;	// choose whichever is smaller in magnitude
 				return min_val <= tolerance;							// if the smaller magnitude value is within the tolerance, then we are within tolerance
 			}
 
 	};	// struct bam64
 
+
 	// are two bam values within the specified tolerance of each other?
-	inline constexpr bool within_distance(bam64 a, bam64 b, bam64 tolerance) noexcept
+	[[nodiscard]] inline constexpr bool within_distance(bam64 a, bam64 b, bam64 tolerance) noexcept
 	{
 		bam64 diff = (a - b);
 		return diff.within_tolerance(tolerance);
 	}
 
+
+	// make bam64s from various periodic units
+
+	//
+	[[nodiscard]] inline constexpr bam64 bam64_from_turns(double turns) noexcept				{ return bam64::from_base(turns, detail::turn_base); }
+	[[nodiscard]] inline constexpr bam64 bam64_from_minutes(double minutes) noexcept			{ return bam64::from_base(minutes, detail::minute_base); }
+	[[nodiscard]] inline constexpr bam64 bam64_from_seconds(double seconds) noexcept			{ return bam64::from_base(seconds, detail::second_base); }
+	[[nodiscard]] inline constexpr bam64 bam64_from_degrees(double degrees) noexcept			{ return bam64::from_base(degrees, detail::degree_base); }
+	[[nodiscard]] inline constexpr bam64 bam64_from_radians(double radians) noexcept			{ return bam64::from_base(radians, detail::radian_base); }
+	[[nodiscard]] inline constexpr bam64 bam64_from_base(double value, double base) noexcept	{ return bam64::from_base(value, base); }
+
+
+	// convert bam64 to various periodic units
+
+	// fraction - period value in range [0, 1) * base
+	[[nodiscard]] inline constexpr double to_fraction(bam64 bam) noexcept						{ return bam.fraction(detail::turn_base); }
+	[[nodiscard]] inline constexpr double to_minutes(bam64 bam) noexcept						{ return bam.fraction(detail::minute_base); }
+	[[nodiscard]] inline constexpr double to_seconds(bam64 bam) noexcept						{ return bam.fraction(detail::second_base); }
+	[[nodiscard]] inline constexpr double to_degrees(bam64 bam) noexcept						{ return bam.fraction(detail::degree_base); }
+	[[nodiscard]] inline constexpr double to_radians(bam64 bam) noexcept						{ return bam.fraction(detail::radian_base); }
+	[[nodiscard]] inline constexpr double to_base(bam64 bam, double base) noexcept				{ return bam.fraction(base); }
+
+	// complement - complementary period value in range [0, 1) * base
+	[[nodiscard]] inline constexpr double to_fraction_complement(bam64 bam) noexcept			{ return bam.complement(detail::turn_base); }
+	[[nodiscard]] inline constexpr double to_minutes_complement(bam64 bam) noexcept				{ return bam.complement(detail::minute_base); }
+	[[nodiscard]] inline constexpr double to_seconds_complement(bam64 bam) noexcept				{ return bam.complement(detail::second_base); }
+	[[nodiscard]] inline constexpr double to_degrees_complement(bam64 bam) noexcept				{ return bam.complement(detail::degree_base); }
+	[[nodiscard]] inline constexpr double to_radians_complement(bam64 bam) noexcept				{ return bam.complement(detail::radian_base); }
+	[[nodiscard]] inline constexpr double to_base_complement(bam64 bam, double base) noexcept	{ return bam.complement(base); }
+
+	// opposite - period value half a period away, in range [0, 1) * base
+	[[nodiscard]] inline constexpr double to_fraction_opposite(bam64 bam) noexcept				{ return bam.opposite(detail::turn_base); }
+	[[nodiscard]] inline constexpr double to_minutes_opposite(bam64 bam) noexcept				{ return bam.opposite(detail::minute_base); }
+	[[nodiscard]] inline constexpr double to_seconds_opposite(bam64 bam) noexcept				{ return bam.opposite(detail::second_base); }
+	[[nodiscard]] inline constexpr double to_degrees_opposite(bam64 bam) noexcept				{ return bam.opposite(detail::degree_base); }
+	[[nodiscard]] inline constexpr double to_radians_opposite(bam64 bam) noexcept				{ return bam.opposite(detail::radian_base); }
+	[[nodiscard]] inline constexpr double to_base_opposite(bam64 bam, double base) noexcept		{ return bam.opposite(base); }
+
+	// normal - normalized period value in range (-0.5, 0.5] * base
+	[[nodiscard]] inline constexpr double to_fraction_normal(bam64 bam) noexcept				{ return bam.normal(detail::turn_base); }
+	[[nodiscard]] inline constexpr double to_minutes_normal(bam64 bam) noexcept					{ return bam.normal(detail::minute_base); }
+	[[nodiscard]] inline constexpr double to_seconds_normal(bam64 bam) noexcept					{ return bam.normal(detail::second_base); }
+	[[nodiscard]] inline constexpr double to_degrees_normal(bam64 bam) noexcept					{ return bam.normal(detail::degree_base); }
+	[[nodiscard]] inline constexpr double to_radians_normal(bam64 bam) noexcept					{ return bam.normal(detail::radian_base); }
+	[[nodiscard]] inline constexpr double to_base_normal(bam64 bam, double base) noexcept		{ return bam.normal(base); }
+
+
+	// predefined bam64 constant values
+
 	// "whole" is a whole number of full periods, and "frac" is the fractional part of a full period:
 	// 
-	// bam64::from_turns  ((whole * 1)	  + frac_turns)			== bam::64::from_turns(frac_turns),		frac_turns		in range [0, 1)
-	// bam64::from_time	  ((whole * 60)	  + frac_time_units)	== bam::64::from_time(frac_time_units),	frac_time_units	in range [0, 60)
-	// bam64::from_degrees((whole * 360)  + frac_degrees)		== bam::64::from_degrees(frac_degrees),	frac_degrees	in range [0, 360)
-	// bam64::from_radians((whole * 2pi)  + frac_radians)		== bam::64::from_radians(frac_radians),	frac_radians	in range [0, 2pi)
-	// bam64::from_base	  ((whole * base) + frac_base)			== bam::64::from_base(frac_base, base),	frac_radians	in range [0, base)
+	// bam64_from_turns		((whole * 1)	+ frac_turns)		== bam64_from_turns(frac_turns),		frac_turns		in range [0, 1)
+	// bam64_from_minutes	((whole * 60)	+ frac_minutes)		== bam64_from_minutes(frac_minutes),	frac_minutes	in range [0, 60)
+	// bam64_from_seconds	((whole * 60)	+ frac_seconds)		== bam64_from_seconds(frac_seconds),	frac_seconds	in range [0, 60)
+	// bam64_from_degrees	((whole * 360)  + frac_degrees)		== bam64_from_degrees(frac_degrees),	frac_degrees	in range [0, 360)
+	// bam64_from_radians	((whole * 2pi)  + frac_radians)		== bam64_from_radians(frac_radians),	frac_radians	in range [0, 2pi)
+	// bam64_from_base		((whole * base) + frac_base)		== bam64_from_base(frac_base, base),	frac_radians	in range [0, base)
 	//
 	// negative values are allowed, and they will wrap around correctly.
 	// For example, -90 degrees is the same as +270 degrees, and both will produce the same bam value.from_base(double value, double base)
@@ -287,6 +335,7 @@ namespace pcs
 		sixty_fourth =				0x0400000000000000,		//    5.625	degrees
 		seventy_second =			0x038e38e38e38e380,		//    5		degrees
 		ninetieth =					0x02d82d82d82d82e0,		//    4		degrees
+		hundredth =					0x028f5c28f5c28f60,		//    3.6	degrees
 		hundred_twentieth =			0x0222222222222220,		//    3		degrees
 		hundred_eightieth =			0x016c16c16c16c170,		//    2		degrees
 		two_hundred_fortieth =		0x0111111111111110,		//    1.5	degrees
@@ -294,10 +343,12 @@ namespace pcs
 
 		radian =					0x28be60db93910600,		//   57.295779513082323 degrees of a circle
 		degree =					0x00b60b60b60b60b8,		//    1		degrees of a circle
-		minute =					0x0444444444444440,		//    6		degrees of an hour
-		second =					0x0444444444444440,		//    6		degrees of a minute
 		arc_minute =				0x000308b91419ca25,		//   1/60	degrees of a circle
-		arc_second =				0x00000cf2049a07a2		//   1/3600	degrees of a circle
+		arc_second =				0x00000cf2049a07a2,		//   1/3600	degrees of a circle
+		tenth_degree =				0x00123456789abcdf,		//   1/10	degrees of a circle		=	0.0017453292519943296  radians	// fab machining tolerance
+		hundredth_degree =			0x0001d208a5a912e3,		//   1/100	degrees of a circle		=	0.00017453292519943291 radians	// rotary machining tolerance
+		minute =					0x0444444444444440,		//    6		degrees of an hour
+		second =					0x0444444444444440		//    6		degrees of a minute
 	};
 
 }	// namespace pcs
