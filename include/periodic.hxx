@@ -1,11 +1,11 @@
-//          Copyright David Browne 2021-2024.
+//          Copyright David Browne 2021-2025.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
 
 // opening include guard
-#if !defined(PER_PERIODIC_HXX)
-#define PER_PERIODIC_HXX
+#if !defined(PCS_PERIODIC_HXX)
+#define PCS_PERIODIC_HXX
 
 #include <type_traits>				// requirements
 #include <concepts>					// requirements
@@ -1058,9 +1058,6 @@ namespace pcs
 		}
 	};
 
-
-
-	
 }	// namespace pcs
 
 

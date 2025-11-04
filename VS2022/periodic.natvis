@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 	<Type Name="pcs::bam64">
-		<DisplayString>{{ fraction = { 5.4210108624275222e-20 * value } }}</DisplayString>
+		<DisplayString Condition="value &lt;= 0xfffffffffffff800">{{ fraction = { 5.4210108624275222e-20 * value } }}</DisplayString>
+		<DisplayString Condition="value &gt; 0xfffffffffffff800">{{ fraction = { 5.4210108624275222e-20 * 0xfffffffffffff800 } }}</DisplayString>
 		<Expand>
-			<Synthetic Name="fraction"><DisplayString>{ 5.4210108624275222e-20 * value }</DisplayString></Synthetic>
-			<Synthetic Name="complement"><DisplayString>{ 5.4210108624275222e-20 * (~value + 1ULL) }</DisplayString></Synthetic>
-			<Synthetic Name="opposite"><DisplayString>{ 5.4210108624275222e-20 * (value + 0x8000000000000000) }</DisplayString></Synthetic>
-			<Synthetic Name="normal" Condition="value &gt; 0x8000000000000000"><DisplayString>-{ 1 - (5.4210108624275222e-20 * value) }</DisplayString></Synthetic>
+			<Synthetic Name="fraction" Condition="value &lt;= 0xfffffffffffff800"><DisplayString>{ 5.4210108624275222e-20 * value }</DisplayString></Synthetic>
+			<Synthetic Name="fraction" Condition="value &gt; 0xfffffffffffff800"><DisplayString>{ 5.4210108624275222e-20 * 0xfffffffffffff800 }</DisplayString></Synthetic>
+			<Synthetic Name="complement" Condition="value &lt;= 0xfffffffffffff800"><DisplayString>{ 5.4210108624275222e-20 * (~value + 1ULL) }</DisplayString></Synthetic>
+			<Synthetic Name="complement" Condition="value &gt; 0xfffffffffffff800"><DisplayString>{ 5.4210108624275222e-20 * (~0xfffffffffffff800 + 1ULL) }</DisplayString></Synthetic>
+			<Synthetic Name="opposite" Condition="value &lt;= 0xfffffffffffff800"><DisplayString>{ 5.4210108624275222e-20 * (value + 0x8000000000000000) }</DisplayString></Synthetic>
+			<Synthetic Name="opposite" Condition="value &gt; 0xfffffffffffff800"><DisplayString>{ 5.4210108624275222e-20 * (0xfffffffffffff800 + 0x8000000000000000) }</DisplayString></Synthetic>
+			<Synthetic Name="normal" Condition="value &gt;= 0xfffffffffffff800"><DisplayString>-{ 1 - (5.4210108624275222e-20 * 0xfffffffffffff800) }</DisplayString></Synthetic>
+			<Synthetic Name="normal" Condition="value &gt; 0x8000000000000000 &amp;&amp; value &lt; 0xfffffffffffff800"><DisplayString>-{ 1 - (5.4210108624275222e-20 * value) }</DisplayString></Synthetic>
 			<Synthetic Name="normal" Condition="value &lt;= 0x8000000000000000"><DisplayString>{ 5.4210108624275222e-20 * value }</DisplayString></Synthetic>
-			<Synthetic Name="degrees"><DisplayString>{ 1.9515639104739080e-17 * value }</DisplayString></Synthetic>
-			<Synthetic Name="radians"><DisplayString>{ 3.4061215800865545e-19 * value }</DisplayString></Synthetic>
+			<Synthetic Name="degrees" Condition="value &lt;= 0xfffffffffffff800"><DisplayString>{ 1.9515639104739080e-17 * value }</DisplayString></Synthetic>
+			<Synthetic Name="degrees" Condition="value &gt; 0xfffffffffffff800"><DisplayString>{ 1.9515639104739080e-17 * 0xfffffffffffff800 }</DisplayString></Synthetic>
+			<Synthetic Name="radians" Condition="value &lt;= 0xfffffffffffff800"><DisplayString>{ 3.4061215800865545e-19 * value }</DisplayString></Synthetic>
+			<Synthetic Name="radians" Condition="value &gt; 0xfffffffffffff800"><DisplayString>{ 3.4061215800865545e-19 * 0xfffffffffffff800 }</DisplayString></Synthetic>
 			<Synthetic Name="bam"><DisplayString>{ value,x }</DisplayString></Synthetic>
 			<Synthetic Name="dist_to_0" Condition="value &lt;= 0x8000000000000000"><DisplayString>{ value,x }</DisplayString></Synthetic>
 			<Synthetic Name="dist_to_0" Condition="value &gt; 0x8000000000000000"><DisplayString>{ (~value + 1ULL),x }</DisplayString></Synthetic>

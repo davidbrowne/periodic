@@ -179,7 +179,9 @@
   <ItemGroup>
     <ClCompile Include="..\src\main.cxx" />
     <ClCompile Include="..\src\nanobench.cxx" />
+    <ClCompile Include="..\tests\bam64_test.cxx" />
     <ClCompile Include="..\tests\convert_test.cxx" />
+    <ClCompile Include="..\tests\copilot_test.cxx" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="periodic.natvis" />

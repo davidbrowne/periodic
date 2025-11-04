@@ -47,6 +47,12 @@
     <ClCompile Include="..\tests\convert_test.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\tests\bam64_test.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tests\copilot_test.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="periodic.natvis" />

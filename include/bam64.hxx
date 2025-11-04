@@ -1,5 +1,5 @@
 
-//          Copyright David Browne 2021-2025.
+//          Copyright David Browne 2025.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -8,27 +8,30 @@
 #if !defined(PCS_BAM64_HXX)
 #define PCS_BAM64_HXX
 
+#include <compare>
+#include <numbers>
+
 namespace pcs
 {
 	// radian related constants
-	inline static constexpr double half_pi =		1.5707963267948966;
-	inline static constexpr double pi =				3.1415926535897931;			// 3.141592653589793238462643383279502884L
-	inline static constexpr double two_pi =			6.2831853071795862;			// 6.283185307179586476925286766559005768L
-	inline static constexpr double tau =			6.2831853071795862;
+	inline static constexpr double two_pi =			2.0 * std::numbers::pi_v<double>;	// 6.283185307179586476925286766559005768
+	inline static constexpr double tau =			two_pi;
+	inline static constexpr double pi =				std::numbers::pi_v<double>;			// 3.141592653589793238462643383279502884
+	inline static constexpr double half_pi =		pi / 2.0;
 
 	// degree related constants
-	inline static constexpr double half_degrees = 180.0;
-	inline static constexpr double full_degrees = 360.0;
+	inline static constexpr double half_degrees =	180.0;
+	inline static constexpr double full_degrees =	360.0;
 
 	// detail namespace for helper functions
 	namespace detail
 	{
 		// constants for converting to/from degrees, radians, turns, time units, etc.
 		inline static constexpr double turn_base =		1.0;					//   1 turn		-> 1 period
-		inline static constexpr double minute_base =   60.0;					//  60 minutes	-> 1 hour
-		inline static constexpr double second_base =   60.0;					//  60 seconds	-> 1 minute
-		inline static constexpr double degree_base =  360.0;					// 360 degrees	-> 1 circle
-		inline static constexpr double radian_base =	6.2831853071795862;		// 2pi radians	-> 1 circle
+		inline static constexpr double minute_base =	60.0;					//  60 minutes	-> 1 hour
+		inline static constexpr double second_base =	60.0;					//  60 seconds	-> 1 minute
+		inline static constexpr double degree_base =	pcs::full_degrees;		// 360 degrees	-> 1 circle
+		inline static constexpr double radian_base =	pcs::two_pi;			// 2pi radians	-> 1 circle
 
 		// truncate towards zero
 		inline constexpr double trunc(double value) noexcept			{ return static_cast<double>(static_cast<long long>(value)); }
@@ -70,7 +73,7 @@ namespace pcs
 
 
 	// convert an angle to a representation that is in the range [0, 2pi)
-	// good for wrapping angles that are only a little out of range (angles that might have an extra turn, +/-)
+	// good for wrapping angles that are only a little out of range (angles that might have one extra turn, +/-)
 	inline constexpr double full_radians(double radians)
 	{
 		// adjust from the negative side
@@ -83,7 +86,7 @@ namespace pcs
 	}
 
 	// convert an angle to a normalized representation that is in the range (-pi, pi)
-	// good for wrapping angles that are only a little out of range (angles that might have an extra turn, +/-)
+	// good for wrapping angles that are only a little out of range (angles that might have one extra turn, +/-)
 	inline constexpr double normal_radians(double radians)
 	{
 		// adjust from the negative side
@@ -95,11 +98,32 @@ namespace pcs
 		return radians;
 	}
 
+
+	// alternate versions of to_fraction and to_bam_value that capture only the top 53 bits of precision from a bam value
+
+	// this version skips over neighboring bam values that map to the same double value
+	inline constexpr double to_fraction_alt(unsigned long long bam_value) noexcept
+	{
+		return static_cast<double>(bam_value >> 11) / static_cast<double>(1ULL << 53);
+	}
+
+	// this version skips over neighboring bam values that map to the same double value
+	inline constexpr unsigned long long to_bam_value_alt(double d) noexcept
+	{
+		double fract = detail::fmod(d, 1.0);
+		if (fract < 0)	{ fract += 1.0; }
+		auto u = static_cast<unsigned long long>(fract * (1ULL << 53));		// capture top 53 bits
+		u <<= 11;															// shift to top bits
+																			// optionally fill lower 11 bits deterministically or with noise
+		return u;
+	}
+
+
 	// 64-bit binary angular measurement (bam).
 	// a bam has 64 bits of precision, while a double has only 53 bits of precision,
 	// which means that multiple adjacent bam values can map to a single double value.
 	// this is a position, not a quantity. size comparison makes no sense.
-	// distance between values can make sense, but what units? bam is not a quantity.
+	// distance between values can make sense, but what units? bam is more of a measure rather than a quantity.
 	// but can we use the same representation for a swept angle -- but a periodic swept
 	// angle, not linear, i.e., we can't represent any whole number of periods, just a fractional part.
 	// a full period puts you back to 0.
@@ -119,13 +143,41 @@ namespace pcs
 			static constexpr double bam_to_unit_period = 0x1p-64;			// a multiplier constant to create a [0.0, 1.0) value from a bam value
 
 			// half period bam value constant
-			static constexpr unsigned long long half =	0x8000000000000000;
+			static constexpr unsigned long long half =		0x8000000000000000;
+
+			// for the alternate version, number of consecutive bam values that map to a single double value, going from 64 bits to 53 bits.
+			// this is used to skip over neighboring bam values that map to the same double value.
+			// for the non-alternate version, this value is the average spacing between bam values that map to neighboring consecutive double values.
+			static constexpr unsigned long long epsilon =	0x0000000000000800;
+
+			// absolute value
+			[[nodiscard]] static constexpr double abs(double value) noexcept		{ return (value < 0) ? -value : value; }
 
 			// truncate towards zero
 			[[nodiscard]] static constexpr double trunc(double value) noexcept		{ return static_cast<double>(static_cast<long long>(value)); }
 
-			// the floating point remainder of division
-			[[nodiscard]] static constexpr double fmod(double x, double y) noexcept	{ return x / y - bam64::trunc(x / y); }
+			// the floating point remainder of division -- returns a value in range (-1.0, 1.0)
+			[[nodiscard]] static constexpr double fmod(double x, double y) noexcept
+			{
+				double turns = x / y;					// gives value in turns
+				if (bam64::abs(turns) > 2.0)
+				{
+					// this way sems to be more accurate for larger values
+					return turns - bam64::trunc(turns);
+				}
+				else
+				{
+					// this way seems to be more accurate for smaller values
+
+					// adjust from the negative side
+					while (turns <= -1.0)				{ turns += 1.0; }
+
+					// adjust from the positive side
+					while (turns >= 1.0)				{ turns -= 1.0; }
+
+					return turns;
+				}
+			}
 
 			// workhorse function for creating a bam from a fractional part of a full period
 			[[nodiscard]] static constexpr bam64 fractional_base(double value, double base) noexcept
@@ -135,7 +187,29 @@ namespace pcs
 				return bam64{ .value = static_cast<unsigned long long>(fraction * bam64::unit_period_to_bam) };
 			}
 
-		public:
+
+			// for alternate version, nearby bam values that map to neighboring consecutive double values
+
+			// skip over neighboring bam values that map to the same double value
+			[[nodiscard]] constexpr bam64 next_alt() noexcept			{ return { .value = this->value + bam64::epsilon }; }
+
+			// skip over neighboring bam values that map to the same double value
+			[[nodiscard]] constexpr bam64 previous_alt() noexcept		{ return { .value = this->value - bam64::epsilon }; }
+
+			// alternate method for creating a bam from a fractional part of a full period - captures only the top 53 bits of precision
+			[[nodiscard]] static constexpr bam64 fractional_base_alt(double value, double base) noexcept
+			{
+				double fraction = bam64::fmod(value, base);
+				if (fraction < 0)	{ fraction += 1.0; }							// don't allow negative values if you are casting to an unsigned type
+				auto u = static_cast<unsigned long long>(fraction * (1ULL << 53));	// capture top 53 bits
+				u <<= 11;															// shift to top bits
+				return bam64{ .value = u };
+			}
+
+			// alternate version that only captures the top 53 bits of precision
+			[[nodiscard]] constexpr double fraction_alt(double base = 1.0) const noexcept	{ return base * ((this->value >> 11) / static_cast<double>(1ULL << 53)); }
+
+	public:
 
 			// the bam value
 			unsigned long long value;
@@ -158,32 +232,41 @@ namespace pcs
 			// periodic properties
 
 			// fraction - period value in range [0, 1) * base
-			[[nodiscard]] constexpr double fraction(double base = 1.0) const noexcept		{ return base * this->value * bam64::bam_to_unit_period; }
+			[[nodiscard]] constexpr double fraction(double base = 1.0) const noexcept
+			{ 
+				unsigned long long bam_value = this->value;
+
+				// shenanigans to avoid prematurely having an erroneous double value of 1.0 when converting large bam values to double
+				if (bam_value > 0xfffffffffffff800)
+					bam_value = 0xfffffffffffff800;
+
+				return base * bam_value * bam64::bam_to_unit_period;
+			}
 
 			// complement - complementary period value in range [0, 1) * base
-			[[nodiscard]] constexpr double complement(double base = 1.0) const noexcept		{ return base * (~(*this)).fraction(); }
+			[[nodiscard]] constexpr double complement(double base = 1.0) const noexcept		{ return (~(*this)).fraction(base); }
 
 			// opposite - period value half a period away, in range [0, 1) * base
-			[[nodiscard]] constexpr double opposite(double base = 1.0) const noexcept		{ return base * (-(*this)).fraction(); }
+			[[nodiscard]] constexpr double opposite(double base = 1.0) const noexcept		{ return (-(*this)).fraction(base); }
 
 			// normal - normalized period value in range (-0.5, 0.5] * base
 			[[nodiscard]] constexpr double normal(double base = 1.0) const noexcept
 			{
-				return base * ((this->value > bam64::half) ? -(this->complement()) : this->fraction());
+				return ((this->value > bam64::half) ? -(this->complement(base)) : this->fraction(base));
 			}
 
 
 			// unary operators
 
 			// unary plus is identity operation
-			[[nodiscard]] constexpr bam64 operator +() const noexcept				{ return { .value = this->value }; }
+			[[nodiscard]] constexpr bam64 operator +() const noexcept						{ return { .value = this->value }; }
 
 			// two's complement negation
 			// for a BAM, negation is its complement
-			[[nodiscard]] constexpr bam64 operator ~() const noexcept				{ return { .value = ~(this->value) + 1ULL }; }
+			[[nodiscard]] constexpr bam64 operator ~() const noexcept						{ return { .value = ~(this->value) + 1ULL }; }
 
 			// the position half a period away
-			[[nodiscard]] constexpr bam64 operator -() const noexcept				{ return { .value = this->value + bam64::half }; }
+			[[nodiscard]] constexpr bam64 operator -() const noexcept						{ return { .value = this->value + bam64::half }; }
 
 
 			// binary operators
@@ -195,6 +278,8 @@ namespace pcs
 			[[nodiscard]] constexpr bam64 operator -(bam64 rhs) noexcept					{ return { .value = this->value - rhs.value }; }
 
 			[[nodiscard]] constexpr bam64 operator *(double multiplier) const noexcept		{ return bam64::from_base(this->fraction() * multiplier, 1.0); }
+
+			[[nodiscard]] friend constexpr bam64 operator *(double multiplier, bam64 bam) noexcept			{ return bam * multiplier; }
 
 			[[nodiscard]] constexpr bam64 operator /(double divisor) const noexcept
 			{
@@ -212,13 +297,15 @@ namespace pcs
 			// is the value within the tolerance range of zero?
 			[[nodiscard]] constexpr bool within_tolerance(bam64 tolerance) const noexcept
 			{
-				bam64 neg_val = ~(*this);								// we approach zero from both the low and high sides, so we need the complement value too
-				bam64 min_val = ((*this) > neg_val) ? neg_val : *this;	// choose whichever is smaller in magnitude
-				return min_val <= tolerance;							// if the smaller magnitude value is within the tolerance, then we are within tolerance
+				bam64 comp_val = ~(*this);									// we approach zero from both the low and high sides, so we need the complement value too
+				bam64 min_val = ((*this) > comp_val) ? comp_val : *this;	// choose whichever is smaller in magnitude
+				return min_val <= tolerance;								// if the smaller magnitude value is within the tolerance, then we are within tolerance
 			}
 
 	};	// struct bam64
 
+
+	// distance comparison
 
 	// are two bam values within the specified tolerance of each other?
 	[[nodiscard]] inline constexpr bool within_distance(bam64 a, bam64 b, bam64 tolerance) noexcept
@@ -231,12 +318,12 @@ namespace pcs
 	// make bam64s from various periodic units
 
 	//
-	[[nodiscard]] inline constexpr bam64 bam64_from_turns(double turns) noexcept				{ return bam64::from_base(turns, detail::turn_base); }
-	[[nodiscard]] inline constexpr bam64 bam64_from_minutes(double minutes) noexcept			{ return bam64::from_base(minutes, detail::minute_base); }
-	[[nodiscard]] inline constexpr bam64 bam64_from_seconds(double seconds) noexcept			{ return bam64::from_base(seconds, detail::second_base); }
-	[[nodiscard]] inline constexpr bam64 bam64_from_degrees(double degrees) noexcept			{ return bam64::from_base(degrees, detail::degree_base); }
-	[[nodiscard]] inline constexpr bam64 bam64_from_radians(double radians) noexcept			{ return bam64::from_base(radians, detail::radian_base); }
-	[[nodiscard]] inline constexpr bam64 bam64_from_base(double value, double base) noexcept	{ return bam64::from_base(value, base); }
+	[[nodiscard]] inline constexpr bam64 bam64_from_turns(double turns) noexcept				{ return bam64::from_base(turns,	detail::turn_base); }
+	[[nodiscard]] inline constexpr bam64 bam64_from_minutes(double minutes) noexcept			{ return bam64::from_base(minutes,	detail::minute_base); }
+	[[nodiscard]] inline constexpr bam64 bam64_from_seconds(double seconds) noexcept			{ return bam64::from_base(seconds,	detail::second_base); }
+	[[nodiscard]] inline constexpr bam64 bam64_from_degrees(double degrees) noexcept			{ return bam64::from_base(degrees,	detail::degree_base); }
+	[[nodiscard]] inline constexpr bam64 bam64_from_radians(double radians) noexcept			{ return bam64::from_base(radians,	detail::radian_base); }
+	[[nodiscard]] inline constexpr bam64 bam64_from_base(double value, double base) noexcept	{ return bam64::from_base(value,	base); }
 
 
 	// convert bam64 to various periodic units
@@ -348,7 +435,9 @@ namespace pcs
 		tenth_degree =				0x00123456789abcdf,		//   1/10	degrees of a circle		=	0.0017453292519943296  radians	// fab machining tolerance
 		hundredth_degree =			0x0001d208a5a912e3,		//   1/100	degrees of a circle		=	0.00017453292519943291 radians	// rotary machining tolerance
 		minute =					0x0444444444444440,		//    6		degrees of an hour
-		second =					0x0444444444444440		//    6		degrees of a minute
+		second =					0x0444444444444440,		//    6		degrees of a minute
+
+		epsilon =					0x0000000000000800		// for alternate method, number of consecutive bam values that map to a single double value, going from 64 bits to 53 bits
 	};
 
 }	// namespace pcs
