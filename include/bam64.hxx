@@ -13,6 +13,17 @@
 
 namespace pcs
 {
+	//          Copyright David Browne 2025.
+	// Distributed under the Boost Software License, Version 1.0.
+	//    (See accompanying file LICENSE_1_0.txt or copy at
+	//          https://www.boost.org/LICENSE_1_0.txt)
+
+	// version info
+
+	constexpr inline int BAM64_MAJOR_VERSION = 0;
+	constexpr inline int BAM64_MINOR_VERSION = 1;
+	constexpr inline int BAM64_PATCH_VERSION = 0;
+
 	// radian related constants
 	inline static constexpr double two_pi =			2.0 * std::numbers::pi_v<double>;	// 6.283185307179586476925286766559005768
 	inline static constexpr double tau =			two_pi;

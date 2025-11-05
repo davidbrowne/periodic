@@ -124,7 +124,7 @@ The ```fract()``` function gives the positive remainder of a floating-point valu
 
 [Subnormal numbers](https://en.wikipedia.org/wiki/Subnormal_number) arise in this range, so the precision varies considerably the closer a value gets to 0. Switching to an integral BAM representation can help deal with some of these issues. The original double value still needs to be  converted to a value between 0 and 1, but then it can be converted to the integral representation for further manipulation.
 
-Any integral value or bitfield could be used to represent a binary angular measurement to a certain precision, but since *double* is so important to and is 64 bits in size, an unsigned 64 bit type, *unsigned long long*, is used as the best way to have as much precision as possible that is most compatible with *double*. *double* gives 53 bits precision (including implicit bit), and *unsigned long long* gives 64 bits precision.
+Any integral value or bitfield could be used to represent a binary angular measurement to a certain precision, but since *double* is so important to us and is 64 bits in size, an unsigned 64 bit type, *unsigned long long*, is used as the best way to have as much precision as possible that is most compatible with *double*. *double* gives 53 bits precision (including implicit bit), and *unsigned long long* gives 64 bits precision.
 
 ![bam 64bit](./svg/bam_64bit.svg)
 
@@ -134,21 +134,22 @@ The ```fract()``` function is used to get the intial value in range, then the sc
 
 ## Status
 
-Current version: `v0.1.0`
+Current version of periodic: `v0.1.0`
 
-* Need more conversion tests.
-* Need BAM tests.
+Current version of bam64: `v0.1.0`
+
+* Need to flesh out periodic coordinate system functionality
 
 ## Testing
 
-This project uses [doctest](https://github.com/onqtam/doctest) for testing. We might occasionally use [nanobench](https://github.com/martinus/nanobench) for understanding implementation tradeoffs.
+This project uses [doctest](https://github.com/doctest/doctest) for testing. We might occasionally use [nanobench](https://github.com/martinus/nanobench) for understanding implementation tradeoffs.
 
 ```
-[doctest] doctest version is "2.4.8"
+[doctest] doctest version is "2.4.12"
 [doctest] run with "--help" for options
 ===============================================================================
-[doctest] test cases:  1 |  1 passed | 0 failed | 0 skipped
-[doctest] assertions: 21 | 21 passed | 0 failed |
+[doctest] test cases:  15 |  15 passed | 0 failed | 0 skipped
+[doctest] assertions: 111 | 111 passed | 0 failed |
 [doctest] Status: SUCCESS!
 ```
 
@@ -170,7 +171,7 @@ The libraries we use (some just occasionally):
 ```
 // cxcm - a c++20 library that provides constexpr versions of some <cmath> and related functions.
 //
-//          Copyright David Browne 2020-2022.
+//          Copyright David Browne 2020-2025.
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          https://www.boost.org/LICENSE_1_0.txt)
@@ -179,7 +180,7 @@ The libraries we use (some just occasionally):
 ```
 // doctest.h - the lightest feature-rich C++ single-header testing framework for unit tests and TDD
 //
-// Copyright (c) 2016-2021 Viktor Kirilov
+// Copyright (c) 2016-2023 Viktor Kirilov
 //
 // Distributed under the MIT Software License
 // See accompanying file LICENSE.txt or copy at
@@ -192,5 +193,5 @@ The libraries we use (some just occasionally):
 //
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2019-2021 Martin Ankerl <martin.ankerl@gmail.com>
+// Copyright (c) 2019-2023 Martin Leitner-Ankerl <martin.ankerl@gmail.com>
 ```

@@ -13,8 +13,8 @@
 #include <iostream>
 #include <limits>
 
-#include "../include/bam64.hxx"
-#include "../dev_3rd/doctest.h"
+#include "bam64.hxx"
+#include "doctest.h"
 
 using pcs::bam64;
 

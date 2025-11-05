@@ -7,7 +7,7 @@
 #include "periodic.hxx"
 #include "bam64.hxx"
 #include "utility.hxx"
-#include <cstdio>
+#include <iostream>
 
 //
 //
@@ -16,6 +16,18 @@
 // to demonstrate beyond that.
 //
 //
+
+// print current version numbers
+
+static void print_periodic_version()
+{
+	std::cout << "periodic version: v" << pcs::PERIODIC_MAJOR_VERSION << "." << pcs::PERIODIC_MINOR_VERSION << "." << pcs::PERIODIC_PATCH_VERSION << "\n";
+}
+
+static void print_bam64_version()
+{
+	std::cout << "bam64 version: v" << pcs::BAM64_MAJOR_VERSION << "." << pcs::BAM64_MINOR_VERSION << "." << pcs::BAM64_PATCH_VERSION << "\n\n";
+}
 
 void new_constants()
 {																									//		standard				alternate
@@ -155,6 +167,9 @@ static void sandbox_function()
 
 int main(int argc, char *argv[])
 {
+	print_periodic_version();
+	print_bam64_version();
+
 	sandbox_function();
 
 
