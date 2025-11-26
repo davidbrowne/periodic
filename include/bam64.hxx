@@ -25,10 +25,10 @@ namespace pcs
 	constexpr inline int BAM64_PATCH_VERSION = 0;
 
 	// radian related constants
-	inline static constexpr double two_pi =			2.0 * std::numbers::pi_v<double>;	// 6.283185307179586476925286766559005768
-	inline static constexpr double tau =			two_pi;
 	inline static constexpr double pi =				std::numbers::pi_v<double>;			// 3.141592653589793238462643383279502884
-	inline static constexpr double half_pi =		pi / 2.0;
+	inline static constexpr double half_pi =		pi / 2.0;							// 1.570796326794896619231321691639751442
+	inline static constexpr double two_pi =			2.0 * pi;							// 6.283185307179586476925286766559005768
+	inline static constexpr double tau =			two_pi;
 
 	// degree related constants
 	inline static constexpr double half_degrees =	180.0;
@@ -59,10 +59,10 @@ namespace pcs
 	// good for wrapping angles that may be large, with many extra turns
 	inline constexpr double radians_full(double radians)
 	{
-		double fraction = detail::fmod(detail::abs(radians), pcs::detail::radian_base);
+		double fraction = detail::fmod(radians, pcs::detail::radian_base);
 
 		// compensate for negative angle
-		if (radians < 0)				{ fraction = (1.0 - fraction); }
+		if (radians < 0)				{ fraction += 1.0; }
 
 		return pcs::detail::radian_base * fraction;
 	}
@@ -71,13 +71,13 @@ namespace pcs
 	// good for wrapping angles that may be large, with many extra turns
 	inline constexpr double radians_normal(double radians)
 	{
-		double fraction = detail::fmod(detail::abs(radians), pcs::detail::radian_base);
+		double fraction = detail::fmod(radians, pcs::detail::radian_base);
 
 		// compensate for negative angle
-		if (radians < 0.0)				{ fraction = (1.0 - fraction); }
+		if (fraction < 0)				{ fraction += 1.0; }
 
 		// compensate if in latter half of period
-		if (fraction > 0.5)				{ fraction = (fraction - 1.0); }
+		if (fraction > 0.5)				{ fraction -= 1.0; }
 
 		return pcs::detail::radian_base * fraction;
 	}
@@ -96,12 +96,12 @@ namespace pcs
 		return radians;
 	}
 
-	// convert an angle to a normalized representation that is in the range (-pi, pi)
+	// convert an angle to a normalized representation that is in the range (-pi, pi]
 	// good for wrapping angles that are only a little out of range (angles that might have one extra turn, +/-)
 	inline constexpr double normal_radians(double radians)
 	{
 		// adjust from the negative side
-		while (radians < -pcs::pi)		{ radians += pcs::two_pi; }
+		while (radians <= -pcs::pi)		{ radians += pcs::two_pi; }
 
 		// adjust from the positive side
 		while (radians > pcs::pi)		{ radians -= pcs::two_pi; }
@@ -129,6 +129,16 @@ namespace pcs
 		return u;
 	}
 
+
+	// utility functions
+
+	// c++20 doesn't have std::to_underlying(), but c++23 does, so we provide our own.
+	template <typename E>
+		requires std::is_enum_v<E>
+	[[nodiscard]] constexpr std::underlying_type_t<E> to_underlying(E e) noexcept
+	{
+		return static_cast<std::underlying_type_t<E>>(e);
+	}
 
 	// 64-bit binary angular measurement (bam).
 	// a bam has 64 bits of precision, while a double has only 53 bits of precision,
@@ -220,7 +230,7 @@ namespace pcs
 			// alternate version that only captures the top 53 bits of precision
 			[[nodiscard]] constexpr double fraction_alt(double base = 1.0) const noexcept	{ return base * ((this->value >> 11) / static_cast<double>(1ULL << 53)); }
 
-	public:
+		public:
 
 			// the bam value
 			unsigned long long value;
@@ -240,6 +250,15 @@ namespace pcs
 			}
 
 
+			// modifier functions
+
+			// change underlying bam value
+			constexpr void operator()(unsigned long long arg) noexcept						{ this->value = arg; }
+
+			// the position half a period away
+			[[nodiscard]] constexpr bam64 make_opposite() const noexcept					{ return { .value = this->value + bam64::half }; }
+
+
 			// periodic properties
 
 			// fraction - period value in range [0, 1) * base
@@ -247,7 +266,7 @@ namespace pcs
 			{ 
 				unsigned long long bam_value = this->value;
 
-				// shenanigans to avoid prematurely having an erroneous double value of 1.0 when converting large bam values to double
+				// shenanigans to avoid having an erroneous double value of 1.0 when converting bam values, that are very close to a full turn, to a double
 				if (bam_value > 0xfffffffffffff800)
 					bam_value = 0xfffffffffffff800;
 
@@ -258,13 +277,10 @@ namespace pcs
 			[[nodiscard]] constexpr double complement(double base = 1.0) const noexcept		{ return (~(*this)).fraction(base); }
 
 			// opposite - period value half a period away, in range [0, 1) * base
-			[[nodiscard]] constexpr double opposite(double base = 1.0) const noexcept		{ return (-(*this)).fraction(base); }
+			[[nodiscard]] constexpr double opposite(double base = 1.0) const noexcept		{ return (this->make_opposite()).fraction(base); }
 
 			// normal - normalized period value in range (-0.5, 0.5] * base
-			[[nodiscard]] constexpr double normal(double base = 1.0) const noexcept
-			{
-				return ((this->value > bam64::half) ? -(this->complement(base)) : this->fraction(base));
-			}
+			[[nodiscard]] constexpr double normal(double base = 1.0) const noexcept			{ return ((this->value > bam64::half) ? -(this->complement(base)) : this->fraction(base)); }
 
 
 			// unary operators
@@ -276,8 +292,11 @@ namespace pcs
 			// for a BAM, negation is its complement
 			[[nodiscard]] constexpr bam64 operator ~() const noexcept						{ return { .value = ~(this->value) + 1ULL }; }
 
-			// the position half a period away
-			[[nodiscard]] constexpr bam64 operator -() const noexcept						{ return { .value = this->value + bam64::half }; }
+			// negation is same as complement for a bam
+			[[nodiscard]] constexpr bam64 operator -() const noexcept						{ return { .value = ~(this->value) + 1ULL }; }
+
+			// indirection operator returns a reference to the value underlying bam64
+			[[nodiscard]] unsigned long long & operator*() noexcept							{ return this->value; }
 
 
 			// binary operators

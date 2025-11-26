@@ -99,12 +99,18 @@ TEST_SUITE("test bam64")
 	{
 		pcs::bam64 a = pcs::bam64_from_degrees(60.0);
 		pcs::bam64 b = pcs::bam64_from_degrees(-45.0);
+		pcs::bam64 a2 = pcs::bam64_from_degrees(240.0);
+		pcs::bam64 a3 = -a;
 
 		// unary
 
-		CHECK_UNARY(+a == a);						// clone
-		CHECK_EQ((~b).value, 0x2000000000000000);	// complement
-		CHECK_EQ((-b).value, 0x6000000000000000);	// opposite
+		CHECK_UNARY(+a == a);									// clone
+		CHECK_EQ((~b).value, 0x2000000000000000);				// complement
+		CHECK_EQ(b.make_opposite().value, 0x6000000000000000);	// opposite
+		CHECK_EQ((-a).value, 0xd555555555555600);				// negation
+
+		*a3 = pcs::three_eighths;
+		CHECK_EQ(a3, pcs::bam64::from_bam_value(pcs::three_eighths));	// indirection
 
 		// binary
 

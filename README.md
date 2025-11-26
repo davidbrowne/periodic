@@ -149,7 +149,7 @@ This project uses [doctest](https://github.com/doctest/doctest) for testing. We 
 [doctest] run with "--help" for options
 ===============================================================================
 [doctest] test cases:  15 |  15 passed | 0 failed | 0 skipped
-[doctest] assertions: 111 | 111 passed | 0 failed |
+[doctest] assertions: 113 | 113 passed | 0 failed |
 [doctest] Status: SUCCESS!
 ```
 
