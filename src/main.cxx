@@ -60,6 +60,7 @@ void new_constants()
 	[[maybe_unused]] constexpr auto three_sixteenths =			pcs::bam64_from_degrees( 67.5	);				// 0x3000000000000000	->	0x3000000000000000
 	[[maybe_unused]] constexpr auto sixth =						pcs::bam64_from_degrees( 60		);				// 0x2aaaaaaaaaaaaa00	->	0x2aaaaaaaaaaaa800	*
 	[[maybe_unused]] constexpr auto eighth =					pcs::bam64_from_degrees( 45		);				// 0x2000000000000000	->	0x2000000000000000
+	[[maybe_unused]] constexpr auto nineth =					pcs::bam64_from_degrees( 40		);				// 0x1c71c71c71c71c00	->	0x1c71c71c71c71800	*
 	[[maybe_unused]] constexpr auto tenth =						pcs::bam64_from_degrees( 36		);				// 0x1999999999999a00	->	0x1999999999999800	*
 	[[maybe_unused]] constexpr auto twelfth =					pcs::bam64_from_degrees( 30		);				// 0x1555555555555500	->	0x1555555555555000	*
 	[[maybe_unused]] constexpr auto fifteenth =					pcs::bam64_from_degrees( 24		);				// 0x1111111111111100	->	0x1111111111111000	*
@@ -70,6 +71,7 @@ void new_constants()
 	[[maybe_unused]] constexpr auto thirtieth =					pcs::bam64_from_degrees( 12		);				// 0x0888888888888880	->	0x0888888888888800	*
 	[[maybe_unused]] constexpr auto thirty_second =				pcs::bam64_from_degrees( 11.25	);				// 0x0800000000000000	->	0x0800000000000000
 	[[maybe_unused]] constexpr auto thirty_sixth =				pcs::bam64_from_degrees( 10		);				// 0x071c71c71c71c700	->	0x071c71c71c71c000	*
+	[[maybe_unused]] constexpr auto fortieth =					pcs::bam64_from_degrees(  9		);				// 0x0666666666666680	->	0x0666666666666000	*
 	[[maybe_unused]] constexpr auto fourty_fifth =				pcs::bam64_from_degrees(  8		);				// 0x05b05b05b05b05c0	->	0x05b05b05b05b0000	*
 	[[maybe_unused]] constexpr auto fourty_eighth =				pcs::bam64_from_degrees(  7.5	);				// 0x0555555555555540	->	0x0555555555555000	*
 	[[maybe_unused]] constexpr auto sixtieth =					pcs::bam64_from_degrees(  6		);				// 0x0444444444444440	->	0x0444444444444000	*
@@ -95,8 +97,8 @@ void new_constants()
 
 
 	// 0xfffffffffffff800
-	[[maybe_unused]] auto high_bam = pcs::bam64::from_bam_value(0xfffffffffffff800);
-	[[maybe_unused]] auto highest_bam = pcs::bam64::from_bam_value(0xffffffffffffffff);
+	[[maybe_unused]] auto high_bam		= pcs::bam64::from_bam_value(0xfffffffffffff800);
+	[[maybe_unused]] auto highest_bam	= pcs::bam64::from_bam_value(0xffffffffffffffff);
 
 	auto m = std::map<std::string, pcs::bam64>();
 	m.emplace("radian", pcs::radian);

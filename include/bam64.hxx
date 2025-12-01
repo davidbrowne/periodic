@@ -266,7 +266,8 @@ namespace pcs
 			{ 
 				unsigned long long bam_value = this->value;
 
-				// shenanigans to avoid having an erroneous double value of 1.0 when converting bam values, that are very close to a full turn, to a double
+				// shenanigans to avoid having an erroneous double value of 1.0 when converting
+				// a bam value to a double, for values that are very close to a full turn
 				if (bam_value > 0xfffffffffffff800)
 					bam_value = 0xfffffffffffff800;
 
@@ -436,6 +437,7 @@ namespace pcs
 		three_sixteenths =			0x3000000000000000,		//   67.5	degrees
 		sixth =						0x2aaaaaaaaaaaaa00,		//   60		degrees
 		eighth =					0x2000000000000000,		//   45		degrees
+		nineth =					0x1c71c71c71c71c00,		//   40		degrees
 		tenth =						0x1999999999999a00,		//   36		degrees
 		twelfth =					0x1555555555555500,		//   30		degrees
 		fifteenth =					0x1111111111111100,		//   24		degrees
@@ -446,6 +448,7 @@ namespace pcs
 		thirtieth =					0x0888888888888880,		//   12		degrees
 		thirty_second =				0x0800000000000000,		//   11.25	degrees
 		thirty_sixth =				0x071c71c71c71c700,		//   10		degrees
+		fortieth =					0x0666666666666680,		//    9		degrees
 		fourty_fifth =				0x05b05b05b05b05c0,		//    8		degrees
 		fourty_eighth =				0x0555555555555540,		//    7.5	degrees
 		sixtieth =					0x0444444444444440,		//    6		degrees
